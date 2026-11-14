@@ -1,3 +1,18 @@
+# AEmulator 0.0.0.4
+
+### روت واقعی
+- یک su واقعی و شفاف برای گست (`tools/romroot/su.c`، arm64 بدون libc، ~۲ کیلوبایت): اجرای `/system/bin/sh` خود فریمور با stdin/out/err دست‌نخورده. su قبلی یک‌بار پاسخ می‌داد و خارج می‌شد — چکرها رد می‌شدند اما libsu در Shizuku یک نشست باز نگه می‌دارد و به stdin می‌نویسد، پس هر راه‌اندازی روت می‌خوابید. حالا `su`، `su CMD`، `su -c CMD`، `su -mm`، `su -v/-V` همان‌طور که libsu و Shizuku و چکرها انتظار دارند کار می‌کنند.
+- `tools/romroot/rootify.py` یک GSI با ext4 را در همان‌جا به ایمیج روت‌دار تبدیل می‌کند (debugfs): su در `/system/xbin`، `/system/bin`، `/su/bin`، خواص (`ro.debuggable=1`، `ro.secure=0`، test-keys)، لایه Xposed و فایل نشانگر. پشتیبان build.prop همراه است؛ `--undo` همه را برمی‌گرداند.
+- زنجیره راه‌اندازی روت Shizuku سر تا سر کار می‌کند: بررسی app_process، ساخت `/data/local/tmp` در اولین بوت، اجرای سرور با uid 0.
+
+### Xposed API 100
+- گست لایه اعلام Xposed API سطح ۱۰۰ را حمل می‌کند (`tools/xposed`، ساخت ECJ+D8): `de.robv.android.xposed.*` در boot classpath هر اپ — `XposedBridge.getXposedVersion()` عدد ۱۰۰ را برمی‌گرداند. صادقانه: `hookMethod` فقط اعلام شده؛ این ساخت موتور hook برای ART ندارد و فراخوانی با پیام روشن شکست می‌خورد.
+
+### تنظیمات
+- بخش Root جدید برای ایمیج‌های دارای سطح rootify: یک کلید su را (`su` → `su.off`) پیش از هر سرویس گست در سمت میزبان کنار می‌گذارد و برمی‌گرداند. از بوت بعدی اعمال می‌شود.
+
+---
+
 # AEmulator 0.0.0.3
 
 [🇬🇧 English](../../CHANGELOG.md) · [🇷🇺 Русский](CHANGELOG.ru.md) · [🇺🇦 Українська](CHANGELOG.uk.md) · [🇩🇪 Deutsch](CHANGELOG.de.md) · [🇫🇷 Français](CHANGELOG.fr.md) · [🇪🇸 Español](CHANGELOG.es.md) · [🇧🇷 Português](CHANGELOG.pt-BR.md) · [🇮🇹 Italiano](CHANGELOG.it.md) · [🇵🇱 Polski](CHANGELOG.pl.md) · [🇹🇷 Türkçe](CHANGELOG.tr.md) · [🇸🇦 العربية](CHANGELOG.ar.md) · **🇮🇷 فارسی** · [🇮🇳 हिन्दी](CHANGELOG.hi.md) · [🇮🇩 Indonesia](CHANGELOG.id.md) · [🇻🇳 Tiếng Việt](CHANGELOG.vi.md) · [🇨🇳 简体中文](CHANGELOG.zh-CN.md) · [🇯🇵 日本語](CHANGELOG.ja.md) · [🇰🇷 한국어](CHANGELOG.ko.md)

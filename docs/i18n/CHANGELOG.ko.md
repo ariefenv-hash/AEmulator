@@ -1,3 +1,18 @@
+# AEmulator 0.0.0.4
+
+### 진짜 root
+- 게스트에 진짜 투명 su 내장(`tools/romroot/su.c`, libc 없는 arm64 약 2KB): 펌웨어의 `/system/bin/sh`를 stdin/out/err 그대로 exec합니다. 이전 su는 한 번 응답하고 종료해 root 체커는 통과하지만 Shizuku의 libsu는 셸 세션을 유지하고 stdin에 명령을 쓰기에 root 시작이 매번 멈췄습니다. 이제 `su`, `su CMD`, `su -c CMD`, `su -mm`, `su -v/-V` 모두 libsu·Shizuku·일반 체커의 기대대로 동작합니다.
+- `tools/romroot/rootify.py`가 debugfs로 ext4 GSI를 그 자리에서 rooted 이미지로: su를 `/system/xbin`·`/system/bin`·`/su/bin`에 배치, `ro.debuggable=1`·`ro.secure=0`·test-keys 속성, Xposed 레이어, 마커 파일. 원본 build.prop 백업 유지, `--undo`로 전부 복원.
+- Shizuku root 시작 체인이 끝까지 동작: app_process 검증, 첫 부팅에 `/data/local/tmp` 생성, 서버는 uid 0로 실행, binder 서비스는 유저 공간 binderd에 등록.
+
+### Xposed API 100
+- 게스트에 API 100의 Xposed 선언 레이어(`tools/xposed`, ECJ+D8 빌드): 모든 앱의 boot classpath에 `de.robv.android.xposed.*`가 있어 `XposedBridge.getXposedVersion()`이 100을 반환하고 LSPosed 계열 매니저가 프레임워크를 인식합니다. 솔직히: `hookMethod`는 선언만 있고 이 빌드에는 ART hook 엔진이 포함되지 않습니다. 호출 시 명시적 오류를 냅니다.
+
+### 설정
+- rootify surface가 있는 이미지에 새 Root 섹션: 하나의 스위치가 게스트 서비스 시작 전에 호스트 측에서 su를 치웠다 복원(`su` → `su.off`). 다음 부팅부터 적용되며 surface 없는 이미지에는 표시되지 않습니다.
+
+---
+
 # AEmulator 0.0.0.3
 
 [🇬🇧 English](../../CHANGELOG.md) · [🇷🇺 Русский](CHANGELOG.ru.md) · [🇺🇦 Українська](CHANGELOG.uk.md) · [🇩🇪 Deutsch](CHANGELOG.de.md) · [🇫🇷 Français](CHANGELOG.fr.md) · [🇪🇸 Español](CHANGELOG.es.md) · [🇧🇷 Português](CHANGELOG.pt-BR.md) · [🇮🇹 Italiano](CHANGELOG.it.md) · [🇵🇱 Polski](CHANGELOG.pl.md) · [🇹🇷 Türkçe](CHANGELOG.tr.md) · [🇸🇦 العربية](CHANGELOG.ar.md) · [🇮🇷 فارسی](CHANGELOG.fa.md) · [🇮🇳 हिन्दी](CHANGELOG.hi.md) · [🇮🇩 Indonesia](CHANGELOG.id.md) · [🇻🇳 Tiếng Việt](CHANGELOG.vi.md) · [🇨🇳 简体中文](CHANGELOG.zh-CN.md) · [🇯🇵 日本語](CHANGELOG.ja.md) · **🇰🇷 한국어**

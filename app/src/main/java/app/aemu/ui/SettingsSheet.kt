@@ -137,6 +137,9 @@ fun SettingsSheet(img: GuestImage, onDismiss: () -> Unit, onSave: (VmSettings) -
             Spacer(Modifier.height(12.dp))
             HostServicesSection(s, img) { s = it }
 
+            Spacer(Modifier.height(12.dp))
+            RootSection(img, s) { s = it }
+
             Spacer(Modifier.height(8.dp))
             Text(stringResource(R.string.vs_advanced), style = MaterialTheme.typography.titleMedium)
             OutlinedTextField(value = s.qemuArgs, onValueChange = { s = s.copy(qemuArgs = it) },
@@ -201,6 +204,23 @@ private fun NumField(label: String, value: Int, modifier: Modifier, set: (Int) -
     OutlinedTextField(value = text, onValueChange = { v -> text = v.filter(Char::isDigit).take(4); text.toIntOrNull()?.let(set) },
         label = { Text(label) }, singleLine = true, modifier = modifier,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+}
+
+/**
+ * The rootify surface (tools/romroot): a real transparent su in the standard places plus
+ * the Xposed API 100 declaration layer. Shown only for images that ship the surface — on
+ * others there is nothing to switch. Takes effect at the next boot, like every toggle
+ * here: the su copies are parked/restored on the host side before any guest service runs.
+ */
+@Composable
+private fun RootSection(img: GuestImage, s: VmSettings, set: (VmSettings) -> Unit) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val present = remember(img.id) {
+        app.aemu.core.RootSurface.present(app.aemu.core.VmPaths(ctx, img.id).root)
+    }
+    if (!present) return
+    Text(stringResource(R.string.vs_root_title), style = MaterialTheme.typography.titleMedium)
+    Toggle(stringResource(R.string.vs_root), stringResource(R.string.vs_root_sub), s.root) { set(s.copy(root = it)) }
 }
 
 /**

@@ -46,6 +46,13 @@ data class VmSettings(
     /** extra qemu options; KEY=VALUE tokens are passed as environment variables */
     val qemuArgs: String = "",
     /**
+     * Root switch for images that ship the rootify surface (see tools/romroot): when off,
+     * the su binaries the image carries are parked beside themselves as `su.off` before
+     * boot; when on they are back in place. Applies at the next boot, like every setting
+     * on this sheet. Images without the surface keep the switch but it does nothing.
+     */
+    val root: Boolean = false,
+    /**
      * Host services this instance may reach over the bridge, by name (see
      * [HostServices]). Persisted so tightening one VM does not touch the others.
      */
@@ -58,6 +65,7 @@ data class VmSettings(
         .put("showFrame", showFrame).put("showNavBar", showNavBar).put("navKeys", navKeys).put("navSize", navSize)
         .put("keepScreenOn", keepScreenOn).put("showLed", showLed).put("mtMode", mtMode).put("legacyEngine", legacyEngine)
         .put("ramMb", ramMb).put("radio", radio).put("native32", native32).put("imei", imei).put("qemuArgs", qemuArgs)
+        .put("root", root)
         .put("hostCaps", JSONArray(hostCaps.sorted()))
 
     companion object {
@@ -106,6 +114,7 @@ data class VmSettings(
                 native32 = o.optBoolean("native32", false),
                 imei = o.optString("imei", ""),
                 qemuArgs = o.optString("qemuArgs", ""),
+                root = o.optBoolean("root", false),
                 hostCaps = o.optJSONArray("hostCaps")?.let { a ->
                     (0 until a.length()).mapNotNull { a.optString(it).takeIf { s -> s.isNotEmpty() } }.toSet()
                 } ?: d.hostCaps,

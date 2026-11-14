@@ -85,7 +85,7 @@ class Analyzer(private val ctx: Context, private val paths: VmPaths, private val
 
         val density = all["ro.sf.lcd_density"]?.toIntOrNull() ?: 240
         val engine = Engine.forApi(api)
-        val settings = when {
+        val settings0 = when {
             engine == Engine.GB || api < 14 -> VmSettings(width = 480, height = 800, density = 240, fbHz = 60, touchHz = 60)
             // 540×960 — лучший баланс скорости и чёткости под эмуляцией; поменять можно в настройках
             density <= 160 -> VmSettings(width = 480, height = 800, density = 240)
@@ -98,6 +98,10 @@ class Analyzer(private val ctx: Context, private val paths: VmPaths, private val
             skin.startsWith("MIUI") && api >= 21 -> VmSettings(width = 1080, height = 1920, density = 480)
             else -> VmSettings(width = 540, height = 960, density = 240)
         }
+        // An image that ships the rootify surface (tools/romroot) starts with the root switch
+        // on: the su copies and the Xposed layer were baked in on purpose, so honor them. The
+        // switch stays adjustable per instance in the settings sheet.
+        val settings = if (app.aemu.core.RootSurface.present(root)) settings0.copy(root = true) else settings0
 
         writePropsTemplate(deflt, build, api, engine, rc.setprops)
 

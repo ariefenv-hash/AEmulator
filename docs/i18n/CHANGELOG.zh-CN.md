@@ -1,3 +1,18 @@
+# AEmulator 0.0.0.4
+
+### 真正的 root
+- 给 guest 配了真正的透传 su（`tools/romroot/su.c`，无 libc arm64，约 2 KB）：直接 exec 固件自己的 `/system/bin/sh`，stdin/out/err 原样透传。上一版失败的原因正是这里——只会回答一次 `su -c id` 的假 su 能骗过 root 检测，但 Shizuku 的 libsu 要保持一个 shell 会话并往 stdin 写命令，于是每次 root 启动都卡死。现在 `su`、`su CMD`、`su -c CMD`、`su -mm`、`su -v/-V` 全部按 libsu、Shizuku 和常见检测工具的预期工作。
+- `tools/romroot/rootify.py` 用 debugfs 就地把 ext4 GSI 改造成 root 镜像：su 落位 `/system/xbin`、`/system/bin`、`/su/bin`，属性面（`ro.debuggable=1`、`ro.secure=0`、test-keys）、Xposed 层和标记文件。原始 build.prop 留有备份，`--undo` 一键还原。
+- Shizuku 的 root 启动链路全程可用：校验 app_process，首次启动创建 `/data/local/tmp`，server 以 uid 0 运行，binder 服务经由用户态 binderd 注册。
+
+### Xposed API 100
+- guest 自带 API 100 的 Xposed 声明层（`tools/xposed`，ECJ+D8 构建，无需 Android SDK）：每个 guest 应用的 boot classpath 上都有 `de.robv.android.xposed.*`，`XposedBridge.getXposedVersion()` 返回 100，LSPosed 一类管理器可识别框架。如实说明：`hookMethod` 只有声明没有接引擎——本版不含 ART hook 引擎，模块调用会得到明确报错而非静默无效。
+
+### 设置
+- 新增 Root 区块（携带 rootify surface 的镜像才显示）：一个开关在 guest 服务启动前于宿主侧收起/恢复 su（`su` → `su.off`），下次启动生效；无 surface 的镜像不显示该区块。
+
+---
+
 # AEmulator 0.0.0.3
 
 [🇬🇧 English](../../CHANGELOG.md) · [🇷🇺 Русский](CHANGELOG.ru.md) · [🇺🇦 Українська](CHANGELOG.uk.md) · [🇩🇪 Deutsch](CHANGELOG.de.md) · [🇫🇷 Français](CHANGELOG.fr.md) · [🇪🇸 Español](CHANGELOG.es.md) · [🇧🇷 Português](CHANGELOG.pt-BR.md) · [🇮🇹 Italiano](CHANGELOG.it.md) · [🇵🇱 Polski](CHANGELOG.pl.md) · [🇹🇷 Türkçe](CHANGELOG.tr.md) · [🇸🇦 العربية](CHANGELOG.ar.md) · [🇮🇷 فارسی](CHANGELOG.fa.md) · [🇮🇳 हिन्दी](CHANGELOG.hi.md) · [🇮🇩 Indonesia](CHANGELOG.id.md) · [🇻🇳 Tiếng Việt](CHANGELOG.vi.md) · **🇨🇳 简体中文** · [🇯🇵 日本語](CHANGELOG.ja.md) · [🇰🇷 한국어](CHANGELOG.ko.md)

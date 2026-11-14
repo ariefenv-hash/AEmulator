@@ -1,3 +1,18 @@
+# AEmulator 0.0.0.4
+
+### Un root vero
+- Un vero su trasparente per il guest (`tools/romroot/su.c`, arm64 senza libc, ~2 KB): exec del `/system/bin/sh` della firmware con stdin/out/err intatti. Il vecchio su rispondeva una volta e usciva — i checker passavano, ma libsu di Shizuku tiene una sessione aperta e scrive su stdin, così ogni avvio root si bloccava. Ora `su`, `su CMD`, `su -c CMD`, `su -mm`, `su -v/-V` funzionano come libsu, Shizuku e i checker si aspettano.
+- `tools/romroot/rootify.py` trasforma un GSI ext4 in immagine rootata sul posto (debugfs): su in `/system/xbin`, `/system/bin`, `/su/bin`, proprietà (`ro.debuggable=1`, `ro.secure=0`, test-keys), il livello Xposed e un file marcatore. Backup di build.prop incluso; `--undo` ripristina tutto.
+- La catena di avvio root di Shizuku funziona da capo a coda: app_process verificato, `/data/local/tmp` creato al primo avvio, server in esecuzione come uid 0.
+
+### Xposed API 100
+- Il guest include un livello di dichiarazione dell'API Xposed di livello 100 (`tools/xposed`, ECJ+D8): `de.robv.android.xposed.*` nel boot classpath di ogni app — `XposedBridge.getXposedVersion()` restituisce 100. Onestamente: `hookMethod` è solo dichiarato; questo build non include un motore di hook ART e la chiamata fallisce con un messaggio chiaro.
+
+### Impostazioni
+- Nuova sezione Root per le immagini con la superficie rootify: un interruttore toglie il su (`su` → `su.off`) lato host prima di qualunque servizio guest e lo rimette. Effettivo al prossimo avvio.
+
+---
+
 # AEmulator 0.0.0.3
 
 [🇬🇧 English](../../CHANGELOG.md) · [🇷🇺 Русский](CHANGELOG.ru.md) · [🇺🇦 Українська](CHANGELOG.uk.md) · [🇩🇪 Deutsch](CHANGELOG.de.md) · [🇫🇷 Français](CHANGELOG.fr.md) · [🇪🇸 Español](CHANGELOG.es.md) · [🇧🇷 Português](CHANGELOG.pt-BR.md) · **🇮🇹 Italiano** · [🇵🇱 Polski](CHANGELOG.pl.md) · [🇹🇷 Türkçe](CHANGELOG.tr.md) · [🇸🇦 العربية](CHANGELOG.ar.md) · [🇮🇷 فارسی](CHANGELOG.fa.md) · [🇮🇳 हिन्दी](CHANGELOG.hi.md) · [🇮🇩 Indonesia](CHANGELOG.id.md) · [🇻🇳 Tiếng Việt](CHANGELOG.vi.md) · [🇨🇳 简体中文](CHANGELOG.zh-CN.md) · [🇯🇵 日本語](CHANGELOG.ja.md) · [🇰🇷 한국어](CHANGELOG.ko.md)

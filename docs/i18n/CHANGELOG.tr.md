@@ -1,3 +1,18 @@
+# AEmulator 0.0.0.4
+
+### Gerçek root
+- Guest için gerçek, saydam bir su (`tools/romroot/su.c`, libc'siz arm64, ~2 KB): firmware'in kendi `/system/bin/sh`'ini stdin/out/err dokunulmadan exec eder. Eski su bir kez yanıtlayıp çıkıyordu — root checker'lar geçiyordu ama Shizuku'nun libsu'su bir oturum açık tutup stdin'e yazdığından her root başlatması takılıyordu. Artık `su`, `su CMD`, `su -c CMD`, `su -mm`, `su -v/-V` libsu, Shizuku ve checker'ların beklediği gibi çalışıyor.
+- `tools/romroot/rootify.py` bir ext4 GSI'yi yerinde rooted imgeye çevirir (debugfs): su `/system/xbin`, `/system/bin`, `/su/bin`'e, özellikler (`ro.debuggable=1`, `ro.secure=0`, test-keys), Xposed katmanı ve bir işaret dosyası. build.prop yedeği dahil; `--undo` her şeyi geri alır.
+- Shizuku'nun root başlatma zinciri uçtan uca çalışır: app_process doğrulanır, ilk açılışta `/data/local/tmp` oluşturulur, sunucu uid 0 ile çalışır.
+
+### Xposed API 100
+- Guest, seviye 100 Xposed API bildirim katmanı taşır (`tools/xposed`, ECJ+D8): her uygulamanın boot classpath'inde `de.robv.android.xposed.*` — `XposedBridge.getXposedVersion()` 100 döndürür. Dürüst olmak gerekirse: `hookMethod` yalnızca bildirildi; bu derlemede ART hook motoru yok ve çağrı net bir hata veriyor.
+
+### Ayarlar
+- rootify yüzeyi taşıyan imajlar için yeni Root bölümü: tek bir anahtar, guest servisleri başlamadan önce su'yu host tarafında kaldırır (`su` → `su.off`) ve geri koyar. Sonraki açılışta etkili olur.
+
+---
+
 # AEmulator 0.0.0.3
 
 [🇬🇧 English](../../CHANGELOG.md) · [🇷🇺 Русский](CHANGELOG.ru.md) · [🇺🇦 Українська](CHANGELOG.uk.md) · [🇩🇪 Deutsch](CHANGELOG.de.md) · [🇫🇷 Français](CHANGELOG.fr.md) · [🇪🇸 Español](CHANGELOG.es.md) · [🇧🇷 Português](CHANGELOG.pt-BR.md) · [🇮🇹 Italiano](CHANGELOG.it.md) · [🇵🇱 Polski](CHANGELOG.pl.md) · **🇹🇷 Türkçe** · [🇸🇦 العربية](CHANGELOG.ar.md) · [🇮🇷 فارسی](CHANGELOG.fa.md) · [🇮🇳 हिन्दी](CHANGELOG.hi.md) · [🇮🇩 Indonesia](CHANGELOG.id.md) · [🇻🇳 Tiếng Việt](CHANGELOG.vi.md) · [🇨🇳 简体中文](CHANGELOG.zh-CN.md) · [🇯🇵 日本語](CHANGELOG.ja.md) · [🇰🇷 한국어](CHANGELOG.ko.md)

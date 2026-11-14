@@ -125,6 +125,15 @@ class GuestRunner(
             else -> e[k] = v
         }
         e.putAll(derivedExports)
+        // Xposed API 100 declaration layer (tools/xposed): rootify put the jar on
+        // /system/framework; riding the boot classpath is what makes every guest app's
+        // parent classloader see de.robv.android.xposed — a checker calling
+        // XposedBridge.getXposedVersion() gets 100 without any per-app setup.
+        RootSurface.xposedJar(paths.root)?.let { jar ->
+            val cur = e["BOOTCLASSPATH"]
+            if (cur == null) e["BOOTCLASSPATH"] = "/system/framework/XposedBridge.jar"
+            else if (!cur.contains("XposedBridge.jar")) e["BOOTCLASSPATH"] = "$cur:/system/framework/XposedBridge.jar"
+        }
         return e
     }
 

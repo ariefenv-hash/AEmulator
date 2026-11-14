@@ -221,3 +221,6 @@
     <string name="m_vnc_stop">Parar servidor VNC</string>
     <string name="m_vnc_started">VNC: %1$s, senha %2$s</string>
 </resources>
+    <string name="vs_root_title">Root</string>
+    <string name="vs_root">Superusuário (su)</string>
+    <string name="vs_root_sub">Um su real e transparente nos caminhos padrão (incluindo o modo root do Shizuku). Desligar arquiva o su até a próxima inicialização.</string>

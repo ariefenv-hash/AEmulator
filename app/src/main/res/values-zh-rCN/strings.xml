@@ -221,3 +221,6 @@
     <string name="m_vnc_stop">停止 VNC 服务器</string>
     <string name="m_vnc_started">VNC：%1$s，密码 %2$s</string>
 </resources>
+    <string name="vs_root_title">根权限</string>
+    <string name="vs_root">超级用户 (su)</string>
+    <string name="vs_root_sub">标准路径内置真实透传 su（包括 Shizuku 的 root 启动模式）。关闭后 su 会在下次启动前收起。</string>

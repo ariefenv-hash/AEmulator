@@ -1,3 +1,18 @@
+# AEmulator 0.0.0.4
+
+### Справжній root
+- Справжній прозорий su для гостя (`tools/romroot/su.c`, arm64 без libc, ~2 КБ): exec власного `/system/bin/sh` прошивки з нетронутими stdin/out/err. Попередній su відповідав раз і виходив — root-чекери проходили, але libsu у Shizuku тримає сесію відкритою і пише в stdin, тож root-запуски зависали. Тепер `su`, `su CMD`, `su -c CMD`, `su -mm`, `su -v/-V` працюють як їх чекають libsu, Shizuku і звичайні чекери.
+- `tools/romroot/rootify.py` перетворює ext4 GSI на rooted-образ на місці (debugfs): su у `/system/xbin`, `/system/bin`, `/su/bin`, властивості (`ro.debuggable=1`, `ro.secure=0`, test-keys), шар Xposed і маркер. Оригінал build.prop зберігається; `--undo` повертає все.
+- Ланцюжок root-запуску Shizuku працює повністю: app_process перевіряється, `/data/local/tmp` створюється при першому завантаженні, сервер працює від uid 0.
+
+### Xposed API 100
+- Гість несе шар оголошення Xposed API рівня 100 (`tools/xposed`, ECJ+D8): `de.robv.android.xposed.*` у boot classpath кожного застосунку — `XposedBridge.getXposedVersion()` повертає 100. Чесно: `hookMethod` лише оголошений, ART hook-двигун у цій збірці не поставляється — виклик дає явну помилку.
+
+### Налаштування
+- Новий розділ Root: один перемикач прибирає su (`su` → `su.off`) до старту гостевих служб і повертає його. Застосовується з наступного завантаження.
+
+---
+
 # AEmulator 0.0.0.3
 
 [🇬🇧 English](../../CHANGELOG.md) · [🇷🇺 Русский](CHANGELOG.ru.md) · **🇺🇦 Українська** · [🇩🇪 Deutsch](CHANGELOG.de.md) · [🇫🇷 Français](CHANGELOG.fr.md) · [🇪🇸 Español](CHANGELOG.es.md) · [🇧🇷 Português](CHANGELOG.pt-BR.md) · [🇮🇹 Italiano](CHANGELOG.it.md) · [🇵🇱 Polski](CHANGELOG.pl.md) · [🇹🇷 Türkçe](CHANGELOG.tr.md) · [🇸🇦 العربية](CHANGELOG.ar.md) · [🇮🇷 فارسی](CHANGELOG.fa.md) · [🇮🇳 हिन्दी](CHANGELOG.hi.md) · [🇮🇩 Indonesia](CHANGELOG.id.md) · [🇻🇳 Tiếng Việt](CHANGELOG.vi.md) · [🇨🇳 简体中文](CHANGELOG.zh-CN.md) · [🇯🇵 日本語](CHANGELOG.ja.md) · [🇰🇷 한국어](CHANGELOG.ko.md)

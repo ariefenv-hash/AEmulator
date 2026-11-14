@@ -221,3 +221,6 @@
     <string name="m_vnc_stop">VNC-Server stoppen</string>
     <string name="m_vnc_started">VNC: %1$s, Passwort %2$s</string>
 </resources>
+    <string name="vs_root_title">Root</string>
+    <string name="vs_root">Superuser (su)</string>
+    <string name="vs_root_sub">Ein echtes, transparentes su an den Standardpfaden (inkl. Shizuku-Root-Modus). Ausgeschaltet wird es bis zum nächsten Start beiseitegelegt.</string>

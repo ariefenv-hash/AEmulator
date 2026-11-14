@@ -221,3 +221,6 @@
     <string name="m_vnc_stop">Hentikan server VNC</string>
     <string name="m_vnc_started">VNC: %1$s, kata sandi %2$s</string>
 </resources>
+    <string name="vs_root_title">Root</string>
+    <string name="vs_root">Superuser (su)</string>
+    <string name="vs_root_sub">su nyata dan transparan di jalur standar (termasuk mode root Shizuku). Menonaktifkan menyimpan su sampai boot berikutnya.</string>

@@ -221,3 +221,6 @@
     <string name="m_vnc_stop">VNC sunucusunu durdur</string>
     <string name="m_vnc_started">VNC: %1$s, şifre %2$s</string>
 </resources>
+    <string name="vs_root_title">Root</string>
+    <string name="vs_root">Süper kullanıcı (su)</string>
+    <string name="vs_root_sub">Standart yollarda gerçek, saydam bir su (Shizuku root modu dahil). Kapalıyken sonraki açılışa kadar su kaldırılır.</string>

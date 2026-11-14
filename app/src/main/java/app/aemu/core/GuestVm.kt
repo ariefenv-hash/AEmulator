@@ -692,6 +692,12 @@ class GuestVm(val ctx: Context, val img: GuestImage) {
             else r.derivedExports = out.readLines().mapNotNull { l -> l.trim().split(' ', limit = 3).takeIf { it.size == 3 && it[0] == "export" }?.let { it[1] to it[2] } }.toMap()
         }
 
+        // root surface (tools/romroot): the switch parks/restores su before anything guest-side
+        // can run, and Shizuku's root launch chain needs its libsu scratch space under
+        // /data/local/tmp to exist from the first boot.
+        RootSurface.apply(paths.root, img.settings.root, ::log)
+        if (engine == Engine.N64) File(paths.root, "data/local/tmp").mkdirs()
+
         // 5. службы гостя по плану из init.rc прошивки
         val plan = servicePlan()
         var glDone = false

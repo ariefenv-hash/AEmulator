@@ -1,3 +1,18 @@
+# AEmulator 0.0.0.4
+
+### 本物の root
+- ゲストに本物の透過 su を同梱（`tools/romroot/su.c`、libc なし arm64 約 2 KB）：ファームウェア自身の `/system/bin/sh` を stdin/out/err をそのままに exec します。以前の su は一度だけ応答して終了していたため、root チェッカーは通るものの、Shizuku の libsu はシェルセッションを保持して stdin に書き込むため起動が毎回停止していました。現在は `su`、`su CMD`、`su -c CMD`、`su -mm`、`su -v/-V` が libsu・Shizuku・各チェッカーの期待どおりに動作します。
+- `tools/romroot/rootify.py` が ext4 GSI を debugfs でその場で rooted イメージ化：su を `/system/xbin`・`/system/bin`・`/su/bin` に配置、`ro.debuggable=1`・`ro.secure=0`・test-keys などのプロパティ、Xposed レイヤー、マーカーファイル。元の build.prop のバックアップを保持し `--undo` で完全復元。
+- Shizuku の root 起動チェーンが端から端まで動作：app_process の検証、初回起動で `/data/local/tmp` を作成、サーバーは uid 0 で実行、binder サービスはユーザー空間の binderd に登録。
+
+### Xposed API 100
+- ゲストは API 100 の Xposed 宣言レイヤーを同梱（`tools/xposed`、ECJ+D8 ビルド）：各アプリの boot classpath に `de.robv.android.xposed.*` があり、`XposedBridge.getXposedVersion()` は 100 を返し、LSPosed 系マネージャーがフレームワークを認識します。率直に：`hookMethod` は宣言のみで、このビルドに ART hook エンジンは同梱されません。呼び出すと明示的なエラーになります。
+
+### 設定
+- rootify surface を持つイメージに新しい Root セクション：一つのスイッチが guest サービス起動前にホスト側で su を退避/復元（`su` → `su.off`）。次回起動時に適用され、surface のないイメージには表示されません。
+
+---
+
 # AEmulator 0.0.0.3
 
 [🇬🇧 English](../../CHANGELOG.md) · [🇷🇺 Русский](CHANGELOG.ru.md) · [🇺🇦 Українська](CHANGELOG.uk.md) · [🇩🇪 Deutsch](CHANGELOG.de.md) · [🇫🇷 Français](CHANGELOG.fr.md) · [🇪🇸 Español](CHANGELOG.es.md) · [🇧🇷 Português](CHANGELOG.pt-BR.md) · [🇮🇹 Italiano](CHANGELOG.it.md) · [🇵🇱 Polski](CHANGELOG.pl.md) · [🇹🇷 Türkçe](CHANGELOG.tr.md) · [🇸🇦 العربية](CHANGELOG.ar.md) · [🇮🇷 فارسی](CHANGELOG.fa.md) · [🇮🇳 हिन्दी](CHANGELOG.hi.md) · [🇮🇩 Indonesia](CHANGELOG.id.md) · [🇻🇳 Tiếng Việt](CHANGELOG.vi.md) · [🇨🇳 简体中文](CHANGELOG.zh-CN.md) · **🇯🇵 日本語** · [🇰🇷 한국어](CHANGELOG.ko.md)

@@ -129,6 +129,9 @@
     <string name="vs_cap_lmkd">Low-memory reports</string>
     <string name="vs_cap_lmkd_sub">The guest says which of its processes to reclaim first.</string>
     <string name="vs_cap_nobridge">This firmware predates the bridge (Android 9); the switches above do nothing for it.</string>
+    <string name="vs_root_title">Root</string>
+    <string name="vs_root">Superuser (su)</string>
+    <string name="vs_root_sub">A real, transparent su in the standard places (Shizuku\'s root mode included). Off parks the su copies until the next boot.</string>
     <string name="m_power_menu">Power menu</string>
     <string name="m_keyboard">Show/hide keyboard</string>
     <string name="m_paste">Paste text from clipboard</string>

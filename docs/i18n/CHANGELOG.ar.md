@@ -1,3 +1,18 @@
+# AEmulator 0.0.0.4
+
+### جذر حقيقي
+- su حقيقي شفاف للضيف (`tools/romroot/su.c`، arm64 بلا libc، ~2 كيلوبايت): ينفّذ `/system/bin/sh` الخاص بالنظام نفسه مع بقاء stdin/out/err كما هي. su القديم كان يجيب مرة واحدة ويخرج — تمرّ الفاحصات، لكن libsu في Shizuku يُبقي جلسة مفتوحة ويكتب إلى stdin فتعلق كل تشغيل جذر. الآن `su` و`su CMD` و`su -c CMD` و`su -mm` و`su -v/-V` تعمل كما تتوقع libsu وShizuku والفاحصات.
+- `tools/romroot/rootify.py` يحوّل GSI بـ ext4 إلى صورة ذات جذر في مكانها (debugfs): su في `/system/xbin` و`/system/bin` و`/su/bin`، وخواص (`ro.debuggable=1`، `ro.secure=0`، test-keys)، وطبقة Xposed، وملف علامة. نسخة احتياطية من build.prop مع `--undo` للاستعادة.
+- سلسلة التشغيل الجذري لـ Shizuku تعمل من طرف إلى طرف: التحقق من app_process، وإنشاء `/data/local/tmp` عند أول إقلاع، وتشغيل الخادم بـ uid 0.
+
+### Xposed API 100
+- يحمل الضيف طبقة إعلان لواجهة Xposed بمستوى 100 (`tools/xposed`، بناء ECJ+D8): `de.robv.android.xposed.*` في boot classpath لكل تطبيق — `XposedBridge.getXposedVersion()` يعيد 100. وبصراحة: `hookMethod` معلَن فقط؛ هذا البناء لا يتضمن محرك hooks لـ ART والنداء يفشل برسالة واضحة.
+
+### الإعدادات
+- قسم Root جديد للصور التي تحمل سطح rootify: مفتاح واحد يُخفي su (`su` → `su.off`) في جانب المضيف قبل أي خدمة ضيف ويعيده. يسري من الإقلاع التالي.
+
+---
+
 # AEmulator 0.0.0.3
 
 [🇬🇧 English](../../CHANGELOG.md) · [🇷🇺 Русский](CHANGELOG.ru.md) · [🇺🇦 Українська](CHANGELOG.uk.md) · [🇩🇪 Deutsch](CHANGELOG.de.md) · [🇫🇷 Français](CHANGELOG.fr.md) · [🇪🇸 Español](CHANGELOG.es.md) · [🇧🇷 Português](CHANGELOG.pt-BR.md) · [🇮🇹 Italiano](CHANGELOG.it.md) · [🇵🇱 Polski](CHANGELOG.pl.md) · [🇹🇷 Türkçe](CHANGELOG.tr.md) · **🇸🇦 العربية** · [🇮🇷 فارسی](CHANGELOG.fa.md) · [🇮🇳 हिन्दी](CHANGELOG.hi.md) · [🇮🇩 Indonesia](CHANGELOG.id.md) · [🇻🇳 Tiếng Việt](CHANGELOG.vi.md) · [🇨🇳 简体中文](CHANGELOG.zh-CN.md) · [🇯🇵 日本語](CHANGELOG.ja.md) · [🇰🇷 한국어](CHANGELOG.ko.md)

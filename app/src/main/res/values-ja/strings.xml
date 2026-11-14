@@ -221,3 +221,6 @@
     <string name="m_vnc_stop">VNC サーバーを停止</string>
     <string name="m_vnc_started">VNC：%1$s、パスワード %2$s</string>
 </resources>
+    <string name="vs_root_title">ルート</string>
+    <string name="vs_root">スーパーユーザー (su)</string>
+    <string name="vs_root_sub">標準パスに本物の透過 su を同梱（Shizuku の root モードを含む）。オフにすると次回起動前に su を退避します。</string>

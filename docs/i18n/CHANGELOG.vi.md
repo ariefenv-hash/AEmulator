@@ -1,3 +1,18 @@
+# AEmulator 0.0.0.4
+
+### Root thật
+- Một su thật, minh bạch cho guest (`tools/romroot/su.c`, arm64 không libc, ~2 KB): exec `/system/bin/sh` của firmware với stdin/out/err nguyên vẹn. su cũ trả lời một lần rồi thoát — checker vượt qua, nhưng libsu của Shizuku giữ một phiên mở và ghi vào stdin nên mọi lần khởi động root đều treo. Giờ `su`, `su CMD`, `su -c CMD`, `su -mm`, `su -v/-V` hoạt động đúng như libsu, Shizuku và các checker mong đợi.
+- `tools/romroot/rootify.py` biến ext4 GSI thành ảnh rooted tại chỗ (debugfs): su vào `/system/xbin`, `/system/bin`, `/su/bin`, thuộc tính (`ro.debuggable=1`, `ro.secure=0`, test-keys), lớp Xposed và tệp đánh dấu. Backup build.prop kèm theo; `--undo` khôi phục tất cả.
+- Chuỗi khởi động root của Shizuku chạy trọn vẹn: app_process được kiểm tra, `/data/local/tmp` tạo ở lần boot đầu, server chạy uid 0.
+
+### Xposed API 100
+- Guest mang lớp khai báo Xposed API mức 100 (`tools/xposed`, build ECJ+D8): `de.robv.android.xposed.*` trên boot classpath của mọi app — `XposedBridge.getXposedVersion()` trả về 100. Thành thật: `hookMethod` chỉ được khai báo; bản build này chưa kèm engine hook ART, gọi sẽ báo lỗi rõ ràng.
+
+### Cài đặt
+- Mục Root mới cho ảnh có surface rootify: một công tắc thu hồi su (`su` → `su.off`) phía host trước khi dịch vụ guest nào chạy và khôi phục lại. Hiệu lực từ lần boot sau.
+
+---
+
 # AEmulator 0.0.0.3
 
 [🇬🇧 English](../../CHANGELOG.md) · [🇷🇺 Русский](CHANGELOG.ru.md) · [🇺🇦 Українська](CHANGELOG.uk.md) · [🇩🇪 Deutsch](CHANGELOG.de.md) · [🇫🇷 Français](CHANGELOG.fr.md) · [🇪🇸 Español](CHANGELOG.es.md) · [🇧🇷 Português](CHANGELOG.pt-BR.md) · [🇮🇹 Italiano](CHANGELOG.it.md) · [🇵🇱 Polski](CHANGELOG.pl.md) · [🇹🇷 Türkçe](CHANGELOG.tr.md) · [🇸🇦 العربية](CHANGELOG.ar.md) · [🇮🇷 فارسی](CHANGELOG.fa.md) · [🇮🇳 हिन्दी](CHANGELOG.hi.md) · [🇮🇩 Indonesia](CHANGELOG.id.md) · **🇻🇳 Tiếng Việt** · [🇨🇳 简体中文](CHANGELOG.zh-CN.md) · [🇯🇵 日本語](CHANGELOG.ja.md) · [🇰🇷 한국어](CHANGELOG.ko.md)
