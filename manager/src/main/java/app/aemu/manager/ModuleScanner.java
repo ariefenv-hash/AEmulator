@@ -61,10 +61,8 @@ public final class ModuleScanner {
             String src = ai.sourceDir == null ? "" : ai.sourceDir;
             m.preinstalled = src.startsWith("/system") || src.startsWith("/product")
                     || src.startsWith("/vendor");
-            // DEFAULT(0) and ENABLED(1) both mean "on"; the two DISABLED states are the
-            // only ones pm disable ever produces here
-            m.pmEnabled = ai.enabled != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-                    && ai.enabled != PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER;
+            // ApplicationInfo.enabled is the plain boolean mirror of the enabledSetting
+            m.pmEnabled = ai.enabled;
             m.registered = registry == null ? null : registry.get(m.pkg);
             out.add(m);
         }
