@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds XposedBridge.jar for the guest boot classpath: the API 100 declaration layer
+# Builds XposedBridge.jar for the guest boot classpath: the API 101 declaration layer
 # (see src/de/robv/android/xposed/XposedBridge.java). Two jars drive the build, both
 # downloaded ahead of time — no Android SDK on this machine:
 #   ECJ_JAR  the Eclipse batch compiler (org.eclipse.jdt.ecj, ~3 MB)

@@ -1,11 +1,13 @@
 package de.robv.android.xposed;
 
 /**
- * The AEmulator Xposed API declaration layer (API 100, the level LSPosed expects).
+ * The AEmulator Xposed API declaration layer (API 101, the level libxposed moved to and
+ * the one the module ecosystem now builds against — CorePatch, Three Finger Swipe and
+ * friends bumped to io.github.libxposed:api 101.0.1 after LSPosed shipped it).
  *
  * This jar lives on the guest's boot classpath, so every guest app sees the
  * de.robv.android.xposed classes through its parent classloader: a checker calling
- * {@link #getXposedVersion()} gets 100 and a module binary linking against the API
+ * {@link #getXposedVersion()} gets 101 and a module binary linking against the API
  * resolves. What this build does NOT bundle is the ART hook engine behind
  * {@link #hookMethod}: a module that actually calls it gets an explicit failure rather
  * than a silent no-op. Faking the engine would be worse than not shipping it — a hook
@@ -13,14 +15,14 @@ package de.robv.android.xposed;
  */
 public final class XposedBridge {
 
-    /** The API level this build speaks: LSPosed treats anything >= 100 as current. */
-    public static final int XPOSED_BRIDGE_VERSION = 100;
+    /** The API level this build speaks: 101, the libxposed generation modules target now. */
+    public static final int XPOSED_BRIDGE_VERSION = 101;
 
     private XposedBridge() {
         // never instantiated
     }
 
-    /** The API level: 100, matching {@link #XPOSED_BRIDGE_VERSION}. */
+    /** The API level: 101, matching {@link #XPOSED_BRIDGE_VERSION}. */
     public static int getXposedVersion() {
         return XPOSED_BRIDGE_VERSION;
     }

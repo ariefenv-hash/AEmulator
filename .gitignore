@@ -1,4 +1,8 @@
 *.apk
+# bundled Xposed modules ride with the repo: rootify --modules installs them as
+# /system/app/<name>/<name>.apk, and a fresh clone should be able to build the
+# full ROM without re-fetching anything (scripts/fetch_modules.py refreshes them)
+!tools/romroot/modules/*.apk
 *_apktool/
 *_jadx/
 .gradle/

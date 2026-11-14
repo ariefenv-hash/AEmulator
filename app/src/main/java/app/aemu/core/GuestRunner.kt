@@ -125,7 +125,7 @@ class GuestRunner(
             else -> e[k] = v
         }
         e.putAll(derivedExports)
-        // Xposed API 100 declaration layer (tools/xposed): rootify put the jar on
+        // Xposed API 101 declaration layer (tools/xposed): rootify put the jar on
         // /system/framework; riding the boot classpath is what makes every guest app's
         // parent classloader see de.robv.android.xposed — a checker calling
         // XposedBridge.getXposedVersion() gets 100 without any per-app setup.

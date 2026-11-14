@@ -4,7 +4,7 @@ import java.io.File
 
 /**
  * The rootify surface of an image (tools/romroot/rootify.py): a real, transparent su in
- * the three standard places, an XposedBridge.jar (API 100 declaration layer) on
+ * the three standard places, an XposedBridge.jar (API 101 declaration layer) on
  * /system/framework, and a marker file recording what version of the surface this is.
  *
  * The root switch applies on the HOST side: `<root>/system` is a plain folder of files

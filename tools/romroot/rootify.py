@@ -8,9 +8,11 @@ Works IN PLACE on a raw ext4 image through debugfs (from the e2fsprogs deb unpac
   2. root-visible build properties         ro.debuggable=1, ro.secure=0, test-keys, ...
   3. Shizuku's root-mode launch chain      app_process present, CLASSPATH points at an apk,
                                            /data/local/tmp exists at boot (host side)
-  4. Xposed API 100 declaration layer      /system/framework/XposedBridge.jar + xposed.prop
-                                           + /system/etc/classpaths/aemu-xposed.environ
-  5. a marker file                         /system/etc/aemu-root.marker
+  4. Xposed API 101 declaration layer      /system/framework/XposedBridge.jar + xposed.prop
+                                           (runner appends the jar to BOOTCLASSPATH host-side)
+  5. bundled Xposed modules                /system/app/<name>/<name>.apk, scanned by the
+                                           PackageManager on first boot — no pm install needed
+  6. a marker file                         /system/etc/aemu-root.marker
 
 The previous attempt (the wiped session) shipped a su that answered `su -c id` once and
 exited: root checkers read the single line and passed, then Shizuku's libsu held the shell
@@ -19,8 +21,8 @@ yes, Shizuku no". The su in this tree (tools/romroot/su.c) execs the real /syste
 with stdio untouched, so the persistent shell protocol works end to end.
 
 Usage:
-  rootify.py system.img --su su --xposed-jar XposedBridge.jar
-  rootify.py system.img --undo        # remove everything this tool added
+  rootify.py system.img --su su --xposed-jar XposedBridge.jar --modules modules/
+  rootify.py system.img --undo        # remove the su/prop/xposed/marker surface (not modules)
 """
 import argparse
 import os
@@ -41,7 +43,35 @@ ROOT_FILES = {
     "marker": "/system/etc/aemu-root.marker",
     "prop_backup": "/system/build.prop.aemu-bak",
 }
-XPOSED_VERSION = "100"
+XPOSED_VERSION = "101"
+
+def install_modules(img: str, modules_dir: str):
+    """Preinstall Xposed modules as system apps. /system/app/<name>/<name>.apk is the
+    AOSP PackageManager scan path, so a bundled module shows up installed on first boot
+    with no pm install round trip. The security.selinux xattr matches the system_file
+    label file_contexts would give the path; on a guest whose SELinux runs enforcing it
+    keeps the scan honest, and on a shim where the label layer is absent it is a no-op.
+    Modules are deliberately NOT wired into --undo: removing system apps from an image
+    someone already booted is a different tool with a different risk profile."""
+    import glob
+    apks = sorted(glob.glob(os.path.join(modules_dir, "*.apk")))
+    if not apks:
+        print(f"  modules: no apk found in {modules_dir}")
+        return []
+    installed = []
+    for apk in apks:
+        name = os.path.splitext(os.path.basename(apk))[0]
+        guest_dir = f"/system/app/{name}"
+        mkdir_p(img, guest_dir)
+        guest_path = f"{guest_dir}/{name}.apk"
+        put_file(img, apk, guest_path, "0100644")
+        ctx = dbg(img, f"setxattr {guest_path} security.selinux u:object_r:system_file:s0",
+                  may_fail=True)
+        if "setxattr" in ctx.lower() and "invalid" in ctx.lower():
+            print(f"  modules: (no selinux xattr support for {name}, context left to restorecon)")
+        installed.append(name)
+    print(f"  modules: {', '.join(installed)}")
+    return installed
 
 def dbg(img: str, cmd: str, may_fail: bool = False) -> str:
     env = dict(os.environ, LD_LIBRARY_PATH=LD)
@@ -96,6 +126,9 @@ def patch_build_prop(img: str):
         "ro.build.selinux": "1",
         "ro.boot.vbmeta.device_state": "unlocked",
         "ro.secureboot.lockstate": "unlocked",
+        # in overrides so a re-rootify at a new API level REPLACES the old line instead of
+        # stacking a second ro.aemu.root after it
+        "ro.aemu.root": XPOSED_VERSION,
     }
     with tempfile.TemporaryDirectory() as td:
         src = os.path.join(td, "build.prop")
@@ -121,7 +154,6 @@ def patch_build_prop(img: str):
         for k, v in overrides.items():
             if k not in seen:
                 out.append(f"{k}={v}")
-        out.append(f"ro.aemu.root={XPOSED_VERSION}")
         patched = os.path.join(td, "build.prop.new")
         open(patched, "w", encoding="utf-8").write("\n".join(out) + "\n")
         put_file(img, patched, "/system/build.prop", "0100644")
@@ -136,7 +168,7 @@ def restore_build_prop(img: str):
     else:
         print("  (no build.prop backup found; properties left as they are)")
 
-def rootify(img: str, su_bin: str, xposed_jar: str):
+def rootify(img: str, su_bin: str, xposed_jar: str, modules_dir: str = ""):
     print(f"rootify: {img}")
     if not exists(img, "/system/build.prop"):
         sys.exit("not a system image (no /system/build.prop)")
@@ -149,7 +181,7 @@ def rootify(img: str, su_bin: str, xposed_jar: str):
     put_file(img, su_bin, ROOT_FILES["su_paths"][2])            # /su/bin/su
     # 2. properties
     patch_build_prop(img)
-    # 4. Xposed API 100 declaration layer. Deliberately NOT on /system/etc/classpaths:
+    # 4. Xposed API 101 declaration layer. Deliberately NOT on /system/etc/classpaths:
     #    Android 12+ derive_classpath reads binary *.pb files there with fs-verity meta
     #    beside them, and a hand-made extra record can fail their checks on first boot and
     #    take the whole BOOTCLASSPATH with it. Instead the runner appends the jar to the
@@ -167,15 +199,18 @@ def rootify(img: str, su_bin: str, xposed_jar: str):
                 "description=Xposed API declaration layer for AEmulator guests\n"
                 "author=AEmulator\n")
             put_file(img, prop, ROOT_FILES["xposed_prop"], "0100644")
-    # 5. marker
+    # 5. bundled modules
+    mods = install_modules(img, modules_dir) if modules_dir and os.path.isdir(modules_dir) else []
+    # 6. marker
     with tempfile.TemporaryDirectory() as td:
         mk = os.path.join(td, "marker")
         import time
         open(mk, "w").write(
-            f"aemu-rootify v2\napi={XPOSED_VERSION}\nsu=AEmulator transparent su\n"
+            f"aemu-rootify v3\napi={XPOSED_VERSION}\nsu=AEmulator transparent su\n"
+            f"modules={','.join(mods) if mods else 'none'}\n"
             f"date={time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}\n")
         put_file(img, mk, ROOT_FILES["marker"], "0100644")
-    print("  done: su x3, build.prop, xposed, marker")
+    print("  done: su x3, build.prop, xposed, modules, marker")
 
 def undo(img: str):
     print(f"undo: {img}")
@@ -199,6 +234,7 @@ def main():
     ap.add_argument("image")
     ap.add_argument("--su", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "su"))
     ap.add_argument("--xposed-jar", default="", help="XposedBridge.jar from tools/xposed/build (optional)")
+    ap.add_argument("--modules", default="", help="directory of module apks to preinstall into /system/app")
     ap.add_argument("--undo", action="store_true")
     ap.add_argument("--skip-fsck", action="store_true")
     a = ap.parse_args()
@@ -209,7 +245,9 @@ def main():
             sys.exit(f"missing su binary: {a.su}")
         if a.xposed_jar and not os.path.exists(a.xposed_jar):
             sys.exit(f"missing jar: {a.xposed_jar}")
-        rootify(a.image, a.su, a.xposed_jar)
+        if a.modules and not os.path.isdir(a.modules):
+            sys.exit(f"missing modules dir: {a.modules}")
+        rootify(a.image, a.su, a.xposed_jar, a.modules)
     if not a.skip_fsck:
         fsck(a.image)
 
