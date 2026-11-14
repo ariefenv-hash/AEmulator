@@ -220,7 +220,7 @@
     <string name="m_vnc">Uruchom serwer VNC</string>
     <string name="m_vnc_stop">Zatrzymaj serwer VNC</string>
     <string name="m_vnc_started">VNC: %1$s, hasło %2$s</string>
-</resources>
     <string name="vs_root_title">Root</string>
     <string name="vs_root">Superuser (su)</string>
     <string name="vs_root_sub">Prawdziwe przezroczyste su w standardowych ścieżkach (łącznie z trybem root Shizuku). Wyłączenie chowa su do następnego uruchomienia.</string>
+</resources>

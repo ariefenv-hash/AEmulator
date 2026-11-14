@@ -1,3 +1,35 @@
+# AEmulator 0.0.0.6
+
+### RAM, without the 4 GB ceiling
+- The settings slider stopped at 4096 MB by construction; heavy Android 15 firmware starved at
+  exactly that. The ladder now runs 256 MB to 16 GB, bounded by what the phone can give: 3/4 of
+  the host's memory (4 GB floor keeps the old ceiling on smaller devices), and a value carried in
+  from another phone's `image.json` outside the steps stays selectable. The auto profile ("what
+  phones of that Android version shipped with") is unchanged.
+
+### Terminal
+- The terminal panel drove one emulator cold start per command through `GuestRunner.run`, so
+  every line cost seconds and `cd`/`export` evaporated between them. `GuestShellSession` keeps
+  one guest `sh` alive: state persists, repeat commands are instant, a dead or `exit`ed shell
+  respawns with the same prefix on the next command, a wedged command times out and resets, and
+  the session closes with the VM.
+
+### The ROM carries a terminal family
+- The Android 15 GSI in the release now preinstalls the five Termux apps (main 0.118.3, :API
+  0.53.0, :Boot 0.8.1, :Float 0.17.0, :Widget 0.15.0 — all one official signature, all
+  system apps scanned on first boot) next to the three Xposed modules.
+- The GSI ships no `adb` client (only the adbd apex): one is injected as `/system/bin/adb`
+  (AOSP platform-tools 35.0.2 bionic build, Apache-2.0), so a guest terminal can run adb
+  against the engine's own AdbServer at `127.0.0.1:5555`.
+- The image grew to 2652 MiB for all of it (the filesystem had 0 free blocks after Termux alone;
+  `scripts/build_rom_v4.sh` resizes when the headroom check says so) — every install verified by
+  byte-exact `debugfs` stat plus `e2fsck`.
+
+### L10n fixes
+- The 0.0.0.4 Root strings had been appended past `</resources>` in 17 locale files (the merge
+  step failed with "markup following the root element"), and French carried an unescaped
+  apostrophe ("jusqu'au"). Both fixed; the release builds again from a clean checkout.
+
 # AEmulator 0.0.0.4
 
 **🇬🇧 English** · [🇷🇺 Русский](docs/i18n/CHANGELOG.ru.md) · [🇨🇳 简体中文](docs/i18n/CHANGELOG.zh-CN.md)

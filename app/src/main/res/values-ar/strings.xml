@@ -220,7 +220,7 @@
     <string name="m_vnc">تشغيل خادم VNC</string>
     <string name="m_vnc_stop">إيقاف خادم VNC</string>
     <string name="m_vnc_started">VNC: %1$s، كلمة المرور %2$s</string>
-</resources>
     <string name="vs_root_title">الجذر</string>
     <string name="vs_root">المستخدم الخارق (su)</string>
     <string name="vs_root_sub">su حقيقي شفاف في المسارات القياسية (يشمل وضع root في Shizuku). الإيقاف يُخفي su حتى الإقلاع التالي.</string>
+</resources>

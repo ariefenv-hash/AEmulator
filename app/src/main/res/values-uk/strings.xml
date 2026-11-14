@@ -220,7 +220,7 @@
     <string name="m_vnc">Запустити VNC-сервер</string>
     <string name="m_vnc_stop">Зупинити VNC-сервер</string>
     <string name="m_vnc_started">VNC: %1$s, пароль %2$s</string>
-</resources>
     <string name="vs_root_title">Root</string>
     <string name="vs_root">Суперкористувач (su)</string>
     <string name="vs_root_sub">Справжній прозорий su у стандартних шляхах (зокрема root-режим Shizuku). Вимкнення прибирає su до наступного завантаження.</string>
+</resources>

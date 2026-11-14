@@ -220,7 +220,7 @@
     <string name="m_vnc">راه‌اندازی سرور VNC</string>
     <string name="m_vnc_stop">توقف سرور VNC</string>
     <string name="m_vnc_started">VNC: %1$s، گذرواژه %2$s</string>
-</resources>
     <string name="vs_root_title">روت</string>
     <string name="vs_root">ابَرسوپرکاربر (su)</string>
     <string name="vs_root_sub">یک su واقعی و شفاف در مسیرهای استاندارد (شامل حالت root شیزوکو). خاموش کردن آن، su را تا بوت بعدی کنار می‌گذارد.</string>
+</resources>

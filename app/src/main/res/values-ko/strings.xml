@@ -220,7 +220,7 @@
     <string name="m_vnc">VNC 서버 시작</string>
     <string name="m_vnc_stop">VNC 서버 중지</string>
     <string name="m_vnc_started">VNC: %1$s, 비밀번호 %2$s</string>
-</resources>
     <string name="vs_root_title">루트</string>
     <string name="vs_root">슈퍼유저 (su)</string>
     <string name="vs_root_sub">표준 경로에 실제 투명 su 내장(Shizuku 루트 모드 포함). 끄면 다음 부팅 전에 su 사본을 치웁니다.</string>
+</resources>

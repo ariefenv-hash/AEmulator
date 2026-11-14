@@ -222,14 +222,24 @@ class GuestRunner(
     companion object {
         private val EXPORTS_SKIP = setOf("PATH", "LD_LIBRARY_PATH", "BOOTCLASSPATH", "LD_PRELOAD")
 
-        /** RAM the guest is told it has: the user's choice, or what phones of that Android version shipped with. */
+        /** the phone's total RAM in MB (MemTotal is already usable RAM), 0 when unreadable */
+        fun hostRamMb(): Int = runCatching {
+            java.io.File("/proc/meminfo").useLines { l -> l.first { it.startsWith("MemTotal:") } }
+                .split(Regex("\\s+"))[1].toLong() / 1024
+        }.getOrDefault(0L).toInt()
+
+        /**
+         * RAM the guest is told it has: the user's choice, or what phones of that Android version
+         * shipped with. The choice is capped at 3/4 of the phone's memory (4 GB floor, so a small
+         * phone keeps the old ceiling) — the hard 4 GB the slider used to stop at starved heavy
+         * Android 15 firmware, but a guest that takes nearly all the phone's RAM takes the phone
+         * down with it, so the ceiling tracks the device instead of a constant.
+         */
         fun guestRamMb(api: Int, chosen: Int): Int {
-            if (chosen > 0) return chosen
+            val hostMb = hostRamMb().takeIf { it > 0 } ?: 8192
+            if (chosen > 0) return chosen.coerceAtMost(maxOf(4096, hostMb * 3 / 4))
             val typical = when { api <= 10 -> 512; api <= 15 -> 1024; api <= 19 -> 2048; api <= 23 -> 3072; else -> 4096 }
-            val hostMb = runCatching {
-                java.io.File("/proc/meminfo").useLines { l -> l.first { it.startsWith("MemTotal:") } }.split(Regex("\\s+"))[1].toLong() / 1024
-            }.getOrDefault(8192L)
-            return typical.coerceAtMost((hostMb / 2).toInt())
+            return typical.coerceAtMost(hostMb / 2)
         }
     }
 }

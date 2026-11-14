@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import app.aemu.core.CpuInfo
 import app.aemu.core.Engine
 import app.aemu.core.GuestImage
+import app.aemu.core.GuestRunner
 import app.aemu.core.HostServices
 import app.aemu.core.Kernel64
 import app.aemu.core.VmSettings
@@ -55,7 +56,7 @@ private val RESOLUTIONS = listOf(
     Res("720×1280", 720, 1280, 320),
 )
 
-private val RAM_STEPS = listOf(0, 256, 512, 768, 1024, 1536, 2048, 3072, 4096)
+private val RAM_STEPS = listOf(0, 256, 512, 768, 1024, 1536, 2048, 3072, 4096, 5120, 6144, 8192, 10240, 12288, 16384)
 
 @Composable
 fun SettingsSheet(img: GuestImage, onDismiss: () -> Unit, onSave: (VmSettings) -> Unit) {
@@ -109,14 +110,22 @@ fun SettingsSheet(img: GuestImage, onDismiss: () -> Unit, onSave: (VmSettings) -
                 if (has32) stringResource(R.string.vs_native32_sub) else stringResource(R.string.vs_native32_unsupported),
                 s.native32 && has32
             ) { if (has32) s = s.copy(native32 = it) }
-            val ramIdx = RAM_STEPS.indexOf(s.ramMb).coerceAtLeast(0)
+            // the ladder reaches what the phone can give: 3/4 of its memory (4 GB floor) instead of the
+            // old hard stop at 4 GB that starved heavy Android 15 firmware. A value that arrived outside
+            // the steps (an imported image.json, a higher ceiling on another phone) stays selectable too.
+            val ramSteps = remember {
+                val ceiling = maxOf(4096, (GuestRunner.hostRamMb() * 3 / 4 / 512) * 512)
+                RAM_STEPS.filter { it == 0 || it <= ceiling }
+            }
+            val ramStepsWithCurrent = if (s.ramMb > 0 && s.ramMb !in ramSteps) (ramSteps + s.ramMb).sorted() else ramSteps
+            val ramIdx = ramStepsWithCurrent.indexOf(s.ramMb).let { if (it < 0) 0 else it }
             ListItem(
                 headlineContent = { Text(stringResource(R.string.vs_ram)) },
                 supportingContent = {
                     Column {
                         Text(if (s.ramMb == 0) stringResource(R.string.vs_ram_auto) else "${s.ramMb} MB")
-                        Slider(value = ramIdx.toFloat(), onValueChange = { s = s.copy(ramMb = RAM_STEPS[it.toInt()]) },
-                            valueRange = 0f..RAM_STEPS.lastIndex.toFloat(), steps = RAM_STEPS.size - 2)
+                        Slider(value = ramIdx.toFloat(), onValueChange = { s = s.copy(ramMb = ramStepsWithCurrent[it.toInt()]) },
+                            valueRange = 0f..(ramStepsWithCurrent.size - 1).toFloat(), steps = ramStepsWithCurrent.size - 2)
                     }
                 },
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),

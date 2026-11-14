@@ -1393,6 +1393,7 @@ class GuestVm(val ctx: Context, val img: GuestImage) {
         adb.stop(); audio.stop(); net.stop(); events.stop(); logd.stop(); lights.stop(); sensors.stop(); mic.stop(); GlHost.stop()
         extraStubs.forEach { it.stop() }; extraStubs.clear()
         lmk?.stop(); lmk = null
+        runCatching { shellSession.close() }
         Keeper.release(ctx)
         setState(State.STOPPED)
     }
@@ -1432,6 +1433,13 @@ class GuestVm(val ctx: Context, val img: GuestImage) {
      */
     fun guestShell(cmd: String, timeoutMs: Long = 60_000): String =
         guestRunner.run(listOf("/system/bin/sh", "-c", shellPrefix + cmd), timeoutMs).second
+
+    /**
+     * The terminal panel's persistent shell: one guest sh that stays alive between commands
+     * (cd/export keep their effect, the next command skips the engine's cold start).
+     * Closed by [stop] together with everything else the engine spawned.
+     */
+    val shellSession by lazy { GuestShellSession(guestRunner, paths.bin, shellPrefix) }
 
     /** Put in front of every guest shell command (menu, adb, terminal): PATH order and the tool wrappers. */
     val shellPrefix: String get() = "export PATH=/system/bin:/system/xbin:\$PATH; $toolWrappers"

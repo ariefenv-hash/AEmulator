@@ -220,7 +220,7 @@
     <string name="m_vnc_started">VNC: %1$s, пароль %2$s</string>
     <string name="as_led">Световой индикатор</string>
     <string name="as_led_sub">Показывать светодиод телефона-гостя над экраном</string>
-</resources>
     <string name="vs_root_title">Root</string>
     <string name="vs_root">Суперпользователь (su)</string>
     <string name="vs_root_sub">Настоящий прозрачный su в стандартных путях (включая root-режим Shizuku). Выключение убирает su до следующей загрузки.</string>
+</resources>

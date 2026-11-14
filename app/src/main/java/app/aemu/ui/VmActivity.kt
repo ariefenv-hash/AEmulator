@@ -1034,7 +1034,9 @@ class VmActivity : ComponentActivity() {
             termLines.add("$ $c")
             busy = true
             thread {
-                val out = runCatching { vm.guestShell(c, 180_000) }.getOrElse { it.toString() }
+                // the persistent session keeps cd/export between commands and skips the
+                // per-command emulator cold start; a dead shell respawns transparently
+                val out = runCatching { vm.shellSession.run(c, 180_000) }.getOrElse { it.toString() }
                 runOnUiThread {
                     termLines.addAll(out.trimEnd('\n').lines())
                     while (termLines.size > 3000) termLines.removeAt(0)

@@ -220,7 +220,7 @@
     <string name="m_vnc">VNC सर्वर शुरू करें</string>
     <string name="m_vnc_stop">VNC सर्वर रोकें</string>
     <string name="m_vnc_started">VNC: %1$s, पासवर्ड %2$s</string>
-</resources>
     <string name="vs_root_title">रूट</string>
     <string name="vs_root">सुपरयूज़र (su)</string>
     <string name="vs_root_sub">मानक पथों में वास्तविक, पारदर्शी su (Shizuku के root मोड सहित). बंद करने पर अगले बूट तक su हटा दिया जाता है।</string>
+</resources>

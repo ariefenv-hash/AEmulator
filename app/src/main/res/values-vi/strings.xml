@@ -220,7 +220,7 @@
     <string name="m_vnc">Bật máy chủ VNC</string>
     <string name="m_vnc_stop">Tắt máy chủ VNC</string>
     <string name="m_vnc_started">VNC: %1$s, mật khẩu %2$s</string>
-</resources>
     <string name="vs_root_title">Root</string>
     <string name="vs_root">Siêu người dùng (su)</string>
     <string name="vs_root_sub">su thực và minh bạch ở đường dẫn chuẩn (bao gồm chế độ root của Shizuku). Tắt sẽ thu hồi su đến lần khởi động sau.</string>
+</resources>
