@@ -319,9 +319,77 @@ jobs:
           path: app/build/outputs/apk/standard/debug/*.apk
           if-no-files-found: error
 
+      - name: upload app release apk
+        uses: actions/upload-artifact@v5
+        with:
+          name: aemu-standard-release
+          path: app/build/outputs/apk/standard/release/*.apk
+          if-no-files-found: error
+
       - name: upload manager apk
         uses: actions/upload-artifact@v5
         with:
           name: aemu-manager
           path: manager/build/outputs/apk/release/*.apk
           if-no-files-found: error
+
+  rom:
+    # Rebuilds the release ROM with the manager APK inside. Dispatch-only: every push
+    # already builds both APKs, and a 1 GB ROM artifact per push would be waste. Needs
+    # the android job, because the manager APK comes from its artifacts.
+    name: rom (manager preinstalled, dispatch only)
+    runs-on: ubuntu-latest
+    needs: android
+    timeout-minutes: 90
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: fetch the current release ROM (the rooted v4 base)
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/rombuild/download"
+          curl -fL -o "$GITHUB_WORKSPACE/rombuild/download/aemu-android15-gsi-root-xposed101-modules.img.xz" \
+            "https://github.com/ariefenv-hash/AEmulator/releases/download/rom-a15-xposed101-modules/aemu-android15-gsi-root-xposed101-modules.img.xz"
+          stat -c'%s bytes' "$GITHUB_WORKSPACE/rombuild/download/aemu-android15-gsi-root-xposed101-modules.img.xz"
+
+      - name: fetch the manager apk from the android job
+        uses: actions/download-artifact@v5
+        with:
+          name: aemu-manager
+          path: "$RUNNER_TEMP/mgr"
+
+      - name: place the manager apk where the rom script looks
+        run: |
+          mkdir -p tools/romroot/manager
+          unzip -o -j "$RUNNER_TEMP/mgr" "*.apk" -d "$RUNNER_TEMP/mgr/x"
+          find "$RUNNER_TEMP/mgr/x" -name '*.apk' -exec cp {} tools/romroot/manager/AEmulatorManager.apk \;
+          ls -l tools/romroot/manager/
+
+      - name: XposedBridge.jar (declaration layer) for the boot classpath
+        run: |
+          curl -fL -o /tmp/ecj.jar https://repo1.maven.org/maven2/org/eclipse/jdt/ecj/3.36.0/ecj-3.36.0.jar
+          curl -fL -o /tmp/r8.jar https://dl.google.com/android/maven2/com/android/tools/r8/8.5.35/r8-8.5.35.jar
+          sh tools/xposed/build.sh
+
+      - name: e2fsprogs under the paths the script expects
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq e2fsprogs xz-utils
+          mkdir -p /tmp/e2f/sbin /tmp/e2f/lib/x86_64-linux-gnu /tmp/e2f/usr/lib/x86_64-linux-gnu
+          ln -sf /usr/sbin/debugfs /tmp/e2f/sbin/debugfs
+          ln -sf /usr/sbin/e2fsck /tmp/e2f/sbin/e2fsck
+          ln -sf /usr/sbin/resize2fs /tmp/e2f/sbin/resize2fs
+          /tmp/e2f/sbin/debugfs -V 2>&1 | head -1
+
+      - name: rootify v4 + manager (in place, debugfs)
+        run: |
+          AEMU_ROOT="$GITHUB_WORKSPACE/rombuild" sh scripts/build_rom_v4.sh 2>&1 | tee "$RUNNER_TEMP/rom.log"
+
+      - name: upload the rebuilt ROM
+        uses: actions/upload-artifact@v5
+        with:
+          name: aemu-rom-manager
+          path: |
+            rombuild/download/*-v2.img.xz
+          if-no-files-found: error
+          compression-level: 0
