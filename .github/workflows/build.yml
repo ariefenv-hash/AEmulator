@@ -383,7 +383,7 @@ jobs:
 
       - name: rootify v4 + manager (in place, debugfs)
         run: |
-          AEMU_ROOT="$GITHUB_WORKSPACE/rombuild" sh scripts/build_rom_v4.sh 2>&1 | tee "$RUNNER_TEMP/rom.log"
+          AEMU_ROOT="$GITHUB_WORKSPACE/rombuild" bash scripts/build_rom_v4.sh 2>&1 | tee "$RUNNER_TEMP/rom.log"
 
       - name: upload the rebuilt ROM
         uses: actions/upload-artifact@v5
