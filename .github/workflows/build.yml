@@ -360,9 +360,9 @@ jobs:
 
       - name: place the manager apk where the rom script looks
         run: |
+          # download-artifact@v5 already extracted the artifact: mgr-dl holds the apk itself
           mkdir -p tools/romroot/manager
-          unzip -o -j mgr-dl "*.apk" -d mgr-dl/x
-          find mgr-dl/x -name '*.apk' -exec cp {} tools/romroot/manager/AEmulatorManager.apk \;
+          find mgr-dl -name '*.apk' -exec cp {} tools/romroot/manager/AEmulatorManager.apk \;
           ls -l tools/romroot/manager/
 
       - name: XposedBridge.jar (declaration layer) for the boot classpath
