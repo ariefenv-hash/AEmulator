@@ -1,13 +1,15 @@
 // AEmulator Manager — the root/Xposed management surface that ships INSIDE the guest.
 // Zero dependencies on purpose: plain android.* views, no androidx, no compose — the APK
 // is ~40 KB and builds in seconds, so CI never becomes the bottleneck for it.
+import java.util.Properties
+
 plugins {
     id("com.android.application")
 }
 
 // same signing story as :app: keystore.properties at the repo root (not in git), debug
 // builds ride the release key when it exists so an update installs over the last one
-val signProps = java.util.Properties().apply {
+val signProps = Properties().apply {
     rootProject.file("keystore.properties").takeIf { it.isFile }?.inputStream()?.use { load(it) }
 }
 val canSign = signProps.getProperty("storeFile")?.let { rootProject.file(it).isFile } == true
