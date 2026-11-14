@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Build the Android 15 GSI ROM v4: Xposed API 101 + 3 modules + the Termux family.
 #
 # Space-critical pipeline (~4.1 GB free at peak):
@@ -70,12 +70,18 @@ dbg_step() {  # dbg_step <label> <debugfs command>: loud when it fails, quiet wh
     exit 1
   fi
 }
-dbg_step "rm old adb" "rm /system/bin/adb"
-dbg_step "write adb" "write $ADB_BIN /system/bin/adb"
-dbg_step "adb mode" "sif /system/bin/adb mode 0100755"
-dbg_step "adb uid" "sif /system/bin/adb uid 0"
-dbg_step "adb gid" "sif /system/bin/adb gid 0"
-dbg_step "adb xattr" "setxattr /system/bin/adb security.selinux u:object_r:system_file:s0"
+ADB_BIN="$AEMU/tools/romroot/bin/adb"
+adb_size=$(env $DBG_ENV "$DBG" -R "stat /system/bin/adb" "$IMG" 2>/dev/null | grep -i "size:" | head -1 | grep -oE "Size: [0-9]+" | awk '{print $2}')
+if [ -n "$adb_size" ] && [ "$adb_size" != "0" ]; then
+  echo "  /system/bin/adb already present ($adb_size bytes) — the v4 base keeps it"
+else
+  dbg_step "rm old adb" "rm /system/bin/adb"
+  dbg_step "write adb" "write $ADB_BIN /system/bin/adb"
+  dbg_step "adb mode" "sif /system/bin/adb mode 0100755"
+  dbg_step "adb uid" "sif /system/bin/adb uid 0"
+  dbg_step "adb gid" "sif /system/bin/adb gid 0"
+  dbg_step "adb xattr" "setxattr /system/bin/adb security.selinux u:object_r:system_file:s0"
+fi
 
 echo "[$(date +%T)] [3.7/6] AEmulator Manager: the guest-side root/Xposed/module surface."
 echo "  Root that nobody can see is root that 'does not work' — the manager is the Magisk-style"
