@@ -356,13 +356,13 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: aemu-manager
-          path: "$RUNNER_TEMP/mgr"
+          path: mgr-dl
 
       - name: place the manager apk where the rom script looks
         run: |
           mkdir -p tools/romroot/manager
-          unzip -o -j "$RUNNER_TEMP/mgr" "*.apk" -d "$RUNNER_TEMP/mgr/x"
-          find "$RUNNER_TEMP/mgr/x" -name '*.apk' -exec cp {} tools/romroot/manager/AEmulatorManager.apk \;
+          unzip -o -j mgr-dl "*.apk" -d mgr-dl/x
+          find mgr-dl/x -name '*.apk' -exec cp {} tools/romroot/manager/AEmulatorManager.apk \;
           ls -l tools/romroot/manager/
 
       - name: XposedBridge.jar (declaration layer) for the boot classpath
