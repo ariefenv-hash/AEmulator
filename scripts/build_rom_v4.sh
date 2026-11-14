@@ -65,6 +65,26 @@ env $DBG_ENV "$DBG" -w -R "sif /system/bin/adb uid 0" "$IMG" 2>/dev/null
 env $DBG_ENV "$DBG" -w -R "sif /system/bin/adb gid 0" "$IMG" 2>/dev/null
 env $DBG_ENV "$DBG" -w -R "setxattr /system/bin/adb security.selinux u:object_r:system_file:s0" "$IMG" 2>/dev/null
 
+echo "[$(date +%T)] [3.7/6] AEmulator Manager: the guest-side root/Xposed/module surface."
+echo "  Root that nobody can see is root that 'does not work' — the manager is the Magisk-style"
+echo "  entry the launcher shows: root probe, module list with enable/disable, pm install of"
+echo "  module APKs dropped into Download, and a one-tap diagnostics battery."
+MGR_APK="${AEMU_MANAGER_APK:-$AEMU/tools/romroot/manager/AEmulatorManager.apk}"
+if [ -f "$MGR_APK" ]; then
+  env $DBG_ENV "$DBG" -w -R "rm /system/app/AEmulatorManager/AEmulatorManager.apk" "$IMG" 2>/dev/null | grep -v "Could not" || true
+  env $DBG_ENV "$DBG" -R "mkdir /system/app/AEmulatorManager" "$IMG" 2>/dev/null || true
+  env $DBG_ENV "$DBG" -w -R "write $MGR_APK /system/app/AEmulatorManager/AEmulatorManager.apk" "$IMG" 2>&1 | tail -1
+  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager/AEmulatorManager.apk mode 0100644" "$IMG" 2>/dev/null
+  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager/AEmulatorManager.apk uid 0" "$IMG" 2>/dev/null
+  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager/AEmulatorManager.apk gid 0" "$IMG" 2>/dev/null
+  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager mode 040755" "$IMG" 2>/dev/null
+  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager uid 0" "$IMG" 2>/dev/null
+  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager gid 0" "$IMG" 2>/dev/null
+  env $DBG_ENV "$DBG" -w -R "setxattr /system/app/AEmulatorManager/AEmulatorManager.apk security.selinux u:object_r:system_file:s0" "$IMG" 2>/dev/null
+else
+  echo "  (no manager apk at $MGR_APK — build :manager and place it there, or set AEMU_MANAGER_APK)"
+fi
+
 echo "[$(date +%T)] [4/6] verification (debugfs)"
 DBG=/tmp/e2f/sbin/debugfs
 DBG_ENV="LD_LIBRARY_PATH=/tmp/e2f/lib/x86_64-linux-gnu:/tmp/e2f/usr/lib/x86_64-linux-gnu"
@@ -77,6 +97,11 @@ for f in /system/app/Termux/Termux.apk /system/app/TermuxAPI/TermuxAPI.apk \
   sz=$(dstat "$f")
   if [ -n "$sz" ] && [ "$sz" != "0" ]; then echo "  OK   $f ($sz bytes)"; else echo "  FAIL $f"; exit 1; fi
 done
+if [ -f "$MGR_APK" ]; then
+  sz=$(dstat /system/app/AEmulatorManager/AEmulatorManager.apk)
+  if [ -n "$sz" ] && [ "$sz" != "0" ]; then echo "  OK   /system/app/AEmulatorManager/AEmulatorManager.apk ($sz bytes)"
+  else echo "  FAIL /system/app/AEmulatorManager/AEmulatorManager.apk"; exit 1; fi
+fi
 env $DBG_ENV "$DBG" -R "stats" "$IMG" 2>/dev/null | grep "Free blocks"
 
 echo "[$(date +%T)] [5/6] compressing new img.xz (xz -6 -T0)"

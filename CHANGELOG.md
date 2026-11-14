@@ -1,3 +1,48 @@
+# AEmulator 0.0.0.7
+
+### The manager: root you can actually see and steer
+- The guest's root and module machinery existed, but nothing on the launcher said so — users
+  saw modules they never installed and no way to install more, and any Magisk-style expectation
+  had no answer. A new `:manager` module ships **AEmulator Manager** (`app.aemu.manager`, plain
+  android.* views, zero dependencies, ~40 KB): the Magisk-style surface that runs inside the guest.
+- **Status page** — a live su probe (`su -c id` with output), the Xposed declaration-layer check
+  done in-process (boot classpath → `XposedBridge.getXposedVersion()` = 101), and the honest
+  "about Magisk" note: root here comes from the engine shim, not MagiskSU, so the Magisk app
+  would report Not installed — this manager is the entry point instead.
+- **Modules page** — every Xposed module the PackageManager can see (classic `xposedmodule`
+  meta-data, the libxposed API generation, `xposedscope`/`xposeddescription` resolved from
+  string or resource), badges for system vs user installs, real enable/disable through
+  `pm disable`/`pm enable` (takes effect: icon gone, app stopped), uninstall for user modules,
+  and "stop scope apps to apply" (`am force-stop` per declared scope — no reboot needed).
+- **Install page** — drop a module APK into `Download` (from the host: the image's shared
+  storage-card folder), tap scan, install via `pm install -r` as root. Preinstalled modules
+  stay disable-only: `/system` is read-only inside the guest by design.
+- **Diagnostics page** — a 15-item battery (su, shim ids, standard su paths, root props, the
+  read-only /system probe, declaration layer, `xposed.prop`, BOOTCLASSPATH injection,
+  preinstalled apps, pm, the module registry write probe, `adb version`, Shizuku server,
+  Termux, `/data/local/tmp`), each with raw output and a copyable report.
+- **Help page** — the how-to in six sections, including why some modules say "not activated":
+  this build ships the API 101 declaration layer without an ART hook engine, and the manager
+  says so instead of pretending.
+- The registry `/data/system/aemu-xposed/modules.conf` (`pkg=on|off`, written base64 through
+  su) is the single enabled-state source both the manager and anything that ever loads module
+  entry points can read. Host settings sheet: a line under the Root switch points at the
+  manager, in all 18 locales.
+
+### Signing, finally solved
+- A new release keystore (RSA-4096, 30-year validity, alias `aemu`) rides the repo as four
+  Actions secrets; CI writes `keystore.properties` and signs **both** the app and the manager
+  with the same stable key — debug and release alike — so updates install over the previous
+  build without the per-runner debug-keystore lottery. The keystore file itself ships as a
+  release asset with the password documented beside it (the old key's password was lost, which
+  is what blocked local signing until now).
+
+### ROM pipeline
+- `scripts/build_rom_v4.sh` installs the manager APK into `/system/app/AEmulatorManager/`
+  (debugfs, same xattr/mode treatment as adb) when it finds one at
+  `tools/romroot/manager/AEmulatorManager.apk` (or `$AEMU_MANAGER_APK`), and verifies it
+  byte-exact along the rest of the family.
+
 # AEmulator 0.0.0.6
 
 ### RAM, without the 4 GB ceiling

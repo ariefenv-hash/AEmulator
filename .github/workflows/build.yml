@@ -214,6 +214,26 @@ jobs:
           sed -i '/^org\.gradle\.java\.home=/d' gradle.properties
           grep -c 'org\.gradle\.java\.home' gradle.properties || echo "pinned JBR path removed"
 
+      # Signing, finally solved: the repo carries the release keystore as an Actions secret
+      # (base64) plus its passwords, so a release APK is signed by a stable key instead of
+      # whatever debug keystore the runner image happened to ship. Without the secrets the
+      # old behaviour stays: debug-signed artifacts, unsigned release.
+      - name: write keystore.properties from repo secrets (when present)
+        env:
+          KS: ${{ secrets.AEMU_KEYSTORE_B64 }}
+          SP: ${{ secrets.AEMU_STORE_PASS }}
+          AL: ${{ secrets.AEMU_KEY_ALIAS }}
+          KP: ${{ secrets.AEMU_KEY_PASS }}
+        run: |
+          if [ -n "$KS" ] && [ -n "$SP" ] && [ -n "$KP" ]; then
+            mkdir -p keystore
+            printf '%s' "$KS" | base64 -d > keystore/aemu-release.jks
+            printf 'storeFile=keystore/aemu-release.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' "$SP" "$AL" "$KP" > keystore.properties
+            echo "keystore written: $(wc -c < keystore/aemu-release.jks) bytes, alias ${AL:-?}"
+          else
+            echo "signing secrets absent: release stays unsigned, debug keeps the runner key"
+          fi
+
       # Gradle output is the only place a compile error can explain itself, and this job's log
       # needs admin rights to download — while check-run annotations are readable by anyone.
       # So every run tees gradle to a file, and the next step republishes the interesting lines
@@ -273,10 +293,12 @@ jobs:
           done < "$ERR"
           echo "published $n annotation line(s) from $mode"
 
-      - name: assemble debug
+      - name: assemble debug (app + manager) and release (both, signed when the keystore is in)
         run: |
           set +e
-          ./gradlew --no-daemon --stacktrace --console=plain :app:assembleStandardDebug 2>&1 \
+          ./gradlew --no-daemon --stacktrace --console=plain \
+            :app:assembleStandardDebug :manager:assembleDebug \
+            :manager:assembleRelease :app:assembleStandardRelease 2>&1 \
             | tee "$RUNNER_TEMP/gradle-assemble.log"
           rc=${PIPESTATUS[0]}
           echo "gradle exit $rc"
@@ -290,9 +312,16 @@ jobs:
           path: app/build/reports/tests/**
           if-no-files-found: ignore
 
-      - name: upload apk
+      - name: upload app apk
         uses: actions/upload-artifact@v5
         with:
           name: aemu-standard-debug
-          path: app/build/outputs/apk/**/*.apk
+          path: app/build/outputs/apk/standard/debug/*.apk
+          if-no-files-found: error
+
+      - name: upload manager apk
+        uses: actions/upload-artifact@v5
+        with:
+          name: aemu-manager
+          path: manager/build/outputs/apk/release/*.apk
           if-no-files-found: error

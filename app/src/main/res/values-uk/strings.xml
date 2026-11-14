@@ -223,4 +223,5 @@
     <string name="vs_root_title">Root</string>
     <string name="vs_root">Суперкористувач (su)</string>
     <string name="vs_root_sub">Справжній прозорий su у стандартних шляхах (зокрема root-режим Shizuku). Вимкнення прибирає su до наступного завантаження.</string>
+    <string name="vs_manager">Менеджер попередньо встановлено в системі: після запуску відкрийте «AEmulator Manager» у списку застосунків — статус root, модулі Xposed, встановлення та діагностика.</string>
 </resources>

@@ -223,4 +223,5 @@
     <string name="vs_root_title">الجذر</string>
     <string name="vs_root">المستخدم الخارق (su)</string>
     <string name="vs_root_sub">su حقيقي شفاف في المسارات القياسية (يشمل وضع root في Shizuku). الإيقاف يُخفي su حتى الإقلاع التالي.</string>
+    <string name="vs_manager">المدير مثبت مسبقاً في النظام: بعد الإقلاع افتح "AEmulator Manager" من قائمة التطبيقات — حالة الروت، وحدات Xposed، التثبيت والتشخيص.</string>
 </resources>

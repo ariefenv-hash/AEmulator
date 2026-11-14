@@ -224,4 +224,5 @@
     <string name="m_vnc_started">VNC: %1$s, password %2$s</string>
     <string name="as_led">Notification light</string>
     <string name="as_led_sub">Show the guest phone’s LED above its screen</string>
+    <string name="vs_manager">The manager ships inside this system: after boot, open "AEmulator Manager" from the app list for root status, Xposed modules, install and diagnostics.</string>
 </resources>

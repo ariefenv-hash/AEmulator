@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AEmulator Manager</string>
+
+    <string name="tab_status">Status</string>
+    <string name="tab_modules">Modules</string>
+    <string name="tab_install">Install</string>
+    <string name="tab_diag">Diagnostics</string>
+    <string name="tab_help">Help</string>
+
+    <string name="root_card_title">Superuser</string>
+    <string name="root_checking">Checking su…</string>
+    <string name="root_ok">root is live</string>
+    <string name="root_fail">su is not usable</string>
+    <string name="root_sub">root on this image comes straight from the AEmulator engine shim; su is a real passthrough shell (su -c runs any command).</string>
+
+    <string name="xposed_card_title">Xposed framework</string>
+    <string name="xposed_checking">Checking…</string>
+    <string name="xposed_api_fmt">API %1$s injected on the boot classpath</string>
+    <string name="xposed_missing">Declaration layer not found (BOOTCLASSPATH has no XposedBridge.jar)</string>
+    <string name="xposed_sub">The declaration layer provides the version, the API classes and module management; hook capability is covered on the Help page and item by item under Diagnostics.</string>
+
+    <string name="note_card_title">About Magisk</string>
+    <string name="note_text">root here does not go through MagiskSU, so the Magisk app would report "Not installed". This manager is the root / Xposed / module surface of this system.</string>
+
+    <string name="btn_refresh">Refresh</string>
+    <string name="modules_empty">No Xposed modules found.\nPreinstalled modules (CorePatch, QAuxiliary, ThreeFingerSwipe) live as system apps; user modules must be installed on the Install page first.</string>
+    <string name="modules_scanning">Scanning installed modules…</string>
+
+    <string name="mod_state_on">enabled</string>
+    <string name="mod_state_off">disabled</string>
+    <string name="mod_preinstall_badge">system</string>
+    <string name="mod_user_badge">user</string>
+    <string name="mod_scope_label">Scope:</string>
+    <string name="mod_scope_none">not declared (global)</string>
+    <string name="mod_desc_none">(no description)</string>
+    <string name="mod_enable">Enable</string>
+    <string name="mod_disable">Disable</string>
+    <string name="mod_uninstall">Uninstall</string>
+    <string name="mod_stop_scope">Stop scope apps to apply</string>
+    <string name="mod_enable_ok">Enabled: %1$s (stop the scope apps to apply)</string>
+    <string name="mod_enable_fail">Enable failed: %1$s</string>
+    <string name="mod_disable_ok">Disabled: %1$s</string>
+    <string name="mod_disable_fail">Disable failed: %1$s</string>
+    <string name="mod_uninstall_ok">Uninstalled: %1$s</string>
+    <string name="mod_uninstall_fail">Uninstall failed (preinstalled modules can only be disabled): %1$s</string>
+    <string name="mod_stop_done">Stopped %1$d app(s); reopening applies the change</string>
+    <string name="mod_working">Working…</string>
+
+    <string name="install_title">Install a module from Download</string>
+    <string name="install_hint">Put the module APK into the Download folder of internal storage, then tap "Scan". Installation uses pm install -r (root); the module then shows up on the Modules page.</string>
+    <string name="install_scan">Scan Download</string>
+    <string name="install_empty">No APK in Download.\nFrom the host, drop module APKs into this system\'s shared storage-card folder, then scan again.</string>
+    <string name="install_btn">Install</string>
+    <string name="install_running">Installing %1$s…</string>
+    <string name="install_ok">Installed: %1$s (enable it on the Modules page)</string>
+    <string name="install_fail">Install failed: %1$s</string>
+    <string name="install_toast_scope">Tip: after installing, enable the module and stop its scope apps.</string>
+
+    <string name="diag_title">Full check</string>
+    <string name="diag_hint">Checks root, Xposed, adb, Shizuku, Termux and the module registry one by one; the result is copyable for a bug report.</string>
+    <string name="diag_start">Run the check</string>
+    <string name="diag_running">Running…</string>
+    <string name="diag_pass">pass</string>
+    <string name="diag_fail">FAIL</string>
+    <string name="diag_warn">note</string>
+    <string name="diag_copy">Copy result</string>
+    <string name="diag_copied">Copied to clipboard</string>
+    <string name="diag_summary_fmt">Done: %1$d pass, %2$d fail, %3$d note</string>
+
+    <string name="su_title">su and grants</string>
+    <string name="su_sub">su is a passthrough shell: every process already runs with root ids via the engine shim, and su provides the standard command-line behaviour (su, su -c, su -mm). Shizuku\'s root mode relies on it.</string>
+    <string name="su_test">Test su -c id</string>
+    <string name="su_props">root properties</string>
+
+    <string name="help_t1">Install and enable a module</string>
+    <string name="help_p1">1. Put the module APK into the Download folder of internal storage (from the host: this system\'s shared storage-card folder).\n2. Open the Install page, tap "Scan Download", then "Install" on the target APK.\n3. On the Modules page tap "Enable".\n4. Tap "Stop scope apps to apply", then reopen the target app.\n\nModules without a declared scope: check the framework state on the Diagnostics page, then reboot and retry.</string>
+    <string name="help_t2">Where to find modules</string>
+    <string name="help_p2">Xposed/LSPosed modules ship on their repos\' GitHub Releases (CorePatch, QAuxiliary and friends are preinstalled). Pick the arm64 APK matching this system and drop it into Download.</string>
+    <string name="help_t3">Why some modules say "not activated"</string>
+    <string name="help_p3">AEmulator currently ships the Xposed API 101 declaration layer: modules install, enable and declare scopes normally, and the API classes and version are visible to them; but this build does not bundle an ART hook engine, so a module\'s actual hook calls do not take effect and its UI may say "not activated". That is the honest state of this build, not a malfunction. The Diagnostics page shows what works.</string>
+    <string name="help_t4">About Magisk</string>
+    <string name="help_p4">root comes from the AEmulator engine shim, not MagiskSU, so the Magisk app would report "Not installed". For root, modules and grants, use this manager.</string>
+    <string name="help_t5">Shizuku and adb</string>
+    <string name="help_p5">Shizuku: when "start via wireless debugging" is not an option, root mode starts with one tap (the su chain is visible under Diagnostics).\nadb: ROM v4 preinstalls the adb client at /system/bin; the terminal (Termux) and this manager\'s install commands do not depend on the host.</string>
+    <string name="help_t6">Why preinstalled modules can only be disabled</string>
+    <string name="help_p6">Preinstalled modules live on the read-only /system partition; the guest cannot delete their files. "Disable" (pm disable) takes real effect: the app stops, its icon leaves the launcher, and it no longer loads inside its scope. To remove them completely, switch firmware images on the host side.</string>
+</resources>

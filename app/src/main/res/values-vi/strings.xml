@@ -223,4 +223,5 @@
     <string name="vs_root_title">Root</string>
     <string name="vs_root">Siêu người dùng (su)</string>
     <string name="vs_root_sub">su thực và minh bạch ở đường dẫn chuẩn (bao gồm chế độ root của Shizuku). Tắt sẽ thu hồi su đến lần khởi động sau.</string>
+    <string name="vs_manager">Trình quản lý được cài sẵn trong hệ thống: sau khi khởi động, mở "AEmulator Manager" trong danh sách ứng dụng — trạng thái root, mô-đun Xposed, cài đặt và chẩn đoán.</string>
 </resources>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AEmulator 管理器</string>
+
+    <string name="tab_status">状态</string>
+    <string name="tab_modules">模块</string>
+    <string name="tab_install">安装</string>
+    <string name="tab_diag">自检</string>
+    <string name="tab_help">帮助</string>
+
+    <string name="root_card_title">超级用户</string>
+    <string name="root_checking">正在检测 su…</string>
+    <string name="root_ok">root 已生效</string>
+    <string name="root_fail">su 不可用</string>
+    <string name="root_sub">本镜像的 root 由 AEmulator 引擎 shim 直接提供，su 是真实的透传外壳（可执行 su -c 任意命令）。</string>
+
+    <string name="xposed_card_title">Xposed 框架</string>
+    <string name="xposed_checking">正在检测…</string>
+    <string name="xposed_api_fmt">API %1$s 已注入 BootClasspath</string>
+    <string name="xposed_missing">声明层未找到（BOOTCLASSPATH 未包含 XposedBridge.jar）</string>
+    <string name="xposed_sub">声明层提供版本号、API 类与模块管理；hook 能力状态见帮助页，自检页可逐项确认。</string>
+
+    <string name="note_card_title">关于「面具」</string>
+    <string name="note_text">本系统的 root 不经过 MagiskSU，安装 Magisk App 只会显示「未安装」。本管理器就是这台虚拟系统的 root / Xposed / 模块管理入口。</string>
+
+    <string name="btn_refresh">刷新</string>
+    <string name="modules_empty">没有发现 Xposed 模块。\n预装模块（CorePatch、QAuxiliary、ThreeFingerSwipe）以系统应用方式存在；用户模块请先在「安装」页安装。</string>
+    <string name="modules_scanning">正在扫描已安装模块…</string>
+
+    <string name="mod_state_on">已启用</string>
+    <string name="mod_state_off">已停用</string>
+    <string name="mod_preinstall_badge">系统预装</string>
+    <string name="mod_user_badge">用户安装</string>
+    <string name="mod_scope_label">作用域：</string>
+    <string name="mod_scope_none">未声明（全局）</string>
+    <string name="mod_desc_none">（模块未提供描述）</string>
+    <string name="mod_enable">启用</string>
+    <string name="mod_disable">停用</string>
+    <string name="mod_uninstall">卸载</string>
+    <string name="mod_stop_scope">停止作用域应用使其生效</string>
+    <string name="mod_enable_ok">已启用：%1$s（记得停止作用域应用）</string>
+    <string name="mod_enable_fail">启用失败：%1$s</string>
+    <string name="mod_disable_ok">已停用：%1$s</string>
+    <string name="mod_disable_fail">停用失败：%1$s</string>
+    <string name="mod_uninstall_ok">已卸载：%1$s</string>
+    <string name="mod_uninstall_fail">卸载失败（系统预装模块只能停用）：%1$s</string>
+    <string name="mod_stop_done">已停止 %1$d 个应用，重新打开即生效</string>
+    <string name="mod_working">正在执行…</string>
+
+    <string name="install_title">从 Download 安装模块</string>
+    <string name="install_hint">把模块 APK 放进内部存储的 Download（下载）目录，然后点「扫描」。安装使用 pm install -r（root），装好的模块会出现在「模块」页。</string>
+    <string name="install_scan">扫描 Download 目录</string>
+    <string name="install_empty">Download 目录里没有 APK。\n在主机端把模块 APK 放进该系统的共享存储卡文件夹（或系统内下载），再点扫描。</string>
+    <string name="install_btn">安装</string>
+    <string name="install_running">正在安装 %1$s…</string>
+    <string name="install_ok">安装成功：%1$s（到「模块」页启用）</string>
+    <string name="install_fail">安装失败：%1$s</string>
+    <string name="install_toast_scope">提示：安装后请在「模块」页启用并停止作用域应用。</string>
+
+    <string name="diag_title">一键体检</string>
+    <string name="diag_hint">逐项检查 root、Xposed、adb、Shizuku、Termux 与模块注册表，结果可直接复制用于反馈。</string>
+    <string name="diag_start">开始体检</string>
+    <string name="diag_running">体检中…</string>
+    <string name="diag_pass">通过</string>
+    <string name="diag_fail">未通过</string>
+    <string name="diag_warn">注意</string>
+    <string name="diag_copy">复制结果</string>
+    <string name="diag_copied">已复制到剪贴板</string>
+    <string name="diag_summary_fmt">体检完成：%1$d 项通过，%2$d 项未通过，%3$d 项注意</string>
+
+    <string name="su_title">su 与授权</string>
+    <string name="su_sub">su 是透传外壳：所有进程经由引擎 shim 已具有 root 权限，su 负责标准命令行行为（su、su -c、su -mm）。Shizuku 的 root 模式依赖这一行为。</string>
+    <string name="su_test">测试 su -c id</string>
+    <string name="su_props">root 属性</string>
+
+    <string name="help_t1">如何安装并启用一个模块</string>
+    <string name="help_p1">1. 把模块 APK 放进内部存储的 Download（下载）目录（主机端可放进该系统的共享存储卡文件夹）。\n2. 打开「安装」页，点「扫描 Download 目录」，对目标 APK 点「安装」。\n3. 到「模块」页点「启用」。\n4. 点「停止作用域应用使其生效」，重开目标应用即可。\n\n没有声明作用域的模块，可以到「自检」页确认框架状态后重启系统再试。</string>
+    <string name="help_t2">去哪里找模块</string>
+    <string name="help_p2">Xposed/LSPosed 模块在各仓库的 GitHub Release 页发布（CorePatch、QAuxiliary 等已预装）。下载时选择与系统匹配的 arm64 APK。装进 Download 目录即可按上面的流程安装。</string>
+    <string name="help_t3">为什么有的模块显示「未激活」</string>
+    <string name="help_p3">AEmulator 当前提供 Xposed API 101 声明层：模块可正常安装、启用、声明作用域，API 类与版本号对模块可见；但本版尚未内置 ART hook 引擎，模块真正的 hook 调用不会生效，其界面可能显示「未激活」。这是当前版本的诚实状态，不是故障。「自检」页可逐项确认哪些能力可用。</string>
+    <string name="help_t4">关于面具（Magisk）</string>
+    <string name="help_p4">本系统的 root 由 AEmulator 引擎 shim 直接提供，不走 MagiskSU，因此安装 Magisk App 只会显示「未安装」。需要 root、模块与授权管理时，直接使用本管理器。</string>
+    <string name="help_t5">Shizuku 与 adb</string>
+    <string name="help_p5">Shizuku：打开 Shizuku App 选「通过无线调试启动」不可用时，root 模式可一键启动（su 链路在自检页可见）。\nadb：ROM v4 已把 adb 客户端预置在 /system/bin，终端（Termux）与「安装」页的安装命令不依赖主机。</string>
+    <string name="help_t6">为什么系统预装模块只能停用</string>
+    <string name="help_p6">预装模块位于只读的 /system 分区，guest 内无法删除其文件；「停用」（pm disable）会真实生效：应用停止、桌面图标消失、作用域内不再加载。如需彻底移除，请回到主机端更换固件镜像。</string>
+</resources>

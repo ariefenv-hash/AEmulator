@@ -223,4 +223,5 @@
     <string name="vs_root_title">روت</string>
     <string name="vs_root">ابَرسوپرکاربر (su)</string>
     <string name="vs_root_sub">یک su واقعی و شفاف در مسیرهای استاندارد (شامل حالت root شیزوکو). خاموش کردن آن، su را تا بوت بعدی کنار می‌گذارد.</string>
+    <string name="vs_manager">مدیر از قبل در سیستم نصب شده است: پس از راه‌اندازی، «AEmulator Manager» را از فهرست برنامه‌ها باز کنید — وضعیت روت، ماژول‌های Xposed، نصب و عیب‌یابی.</string>
 </resources>

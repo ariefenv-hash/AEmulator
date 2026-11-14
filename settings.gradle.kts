@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "AEmulator"
-include(":app")
+include(":app", ":manager")

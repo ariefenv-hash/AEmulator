@@ -223,4 +223,5 @@
     <string name="vs_root_title">Root</string>
     <string name="vs_root">Superuser (su)</string>
     <string name="vs_root_sub">su nyata dan transparan di jalur standar (termasuk mode root Shizuku). Menonaktifkan menyimpan su sampai boot berikutnya.</string>
+    <string name="vs_manager">Manajer sudah terpasang di sistem: setelah boot, buka "AEmulator Manager" dari daftar aplikasi — status root, modul Xposed, instalasi, dan diagnostik.</string>
 </resources>

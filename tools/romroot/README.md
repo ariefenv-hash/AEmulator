@@ -28,6 +28,13 @@ Two pieces, both meant to be audited before they are trusted:
   Needs `debugfs`/`e2fsck` (e2fsprogs). Paths to the binaries can be overridden with
   `DEBUGFS` / `E2FSCK` / `DBG_LD`.
 
+The manager (`AEmulatorManager.apk`, built from the `:manager` module) is the guest-side face
+of all of this — root status, module enable/disable, `pm install` of module APKs dropped into
+Download, and a diagnostics battery. `scripts/build_rom_v4.sh` installs it into
+`/system/app/AEmulatorManager/` and verifies it alongside the rest; without the APK the script
+skips the step. The Magisk app would show "Not installed" on this image by design — root comes
+from the engine shim, not MagiskSU — and the manager's status page says exactly that.
+
 Bundled modules (`modules/`, fetched by `scripts/fetch_modules.py`): three open-source,
 redistribution-friendly Xposed modules preinstalled as system apps so a freshly imported
 ROM already has something to exercise the framework with — **CorePatch** (LSPosed,

@@ -223,4 +223,5 @@
     <string name="vs_root_title">Root</string>
     <string name="vs_root">Süper kullanıcı (su)</string>
     <string name="vs_root_sub">Standart yollarda gerçek, saydam bir su (Shizuku root modu dahil). Kapalıyken sonraki açılışa kadar su kaldırılır.</string>
+    <string name="vs_manager">Yönetici sisteme önceden yüklenmiştir: açılıştan sonra uygulama listesinden "AEmulator Manager"ı açın — root durumu, Xposed modülleri, kurulum ve tanılama.</string>
 </resources>

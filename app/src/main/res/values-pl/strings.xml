@@ -223,4 +223,5 @@
     <string name="vs_root_title">Root</string>
     <string name="vs_root">Superuser (su)</string>
     <string name="vs_root_sub">Prawdziwe przezroczyste su w standardowych ścieżkach (łącznie z trybem root Shizuku). Wyłączenie chowa su do następnego uruchomienia.</string>
+    <string name="vs_manager">Menedżer jest preinstalowany w systemie: po uruchomieniu otwórz „AEmulator Manager" na liście aplikacji — stan roota, moduły Xposed, instalacja i diagnostyka.</string>
 </resources>

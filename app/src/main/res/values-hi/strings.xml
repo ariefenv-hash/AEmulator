@@ -223,4 +223,5 @@
     <string name="vs_root_title">रूट</string>
     <string name="vs_root">सुपरयूज़र (su)</string>
     <string name="vs_root_sub">मानक पथों में वास्तविक, पारदर्शी su (Shizuku के root मोड सहित). बंद करने पर अगले बूट तक su हटा दिया जाता है।</string>
+    <string name="vs_manager">मैनेजर सिस्टम में पहले से इंस्टॉल है: बूट के बाद ऐप सूची से "AEmulator Manager" खोलें — रूट स्थिति, Xposed मॉड्यूल, इंस्टॉल और निदान।</string>
 </resources>

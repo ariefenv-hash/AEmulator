@@ -230,6 +230,8 @@ private fun RootSection(img: GuestImage, s: VmSettings, set: (VmSettings) -> Uni
     if (!present) return
     Text(stringResource(R.string.vs_root_title), style = MaterialTheme.typography.titleMedium)
     Toggle(stringResource(R.string.vs_root), stringResource(R.string.vs_root_sub), s.root) { set(s.copy(root = it)) }
+    Text(stringResource(R.string.vs_manager), style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp, bottom = 4.dp))
 }
 
 /**
