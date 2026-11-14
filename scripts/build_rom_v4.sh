@@ -63,7 +63,9 @@ dbg_step() {  # dbg_step <label> <debugfs command>: loud when it fails, quiet wh
   label="$1"; shift
   if out=$(env $DBG_ENV "$DBG" -w -R "$1" "$IMG" 2>&1); then
     echo "  [$label] ok"
-  elif echo "$out" | grep -qiE "already exists|File not found|Could not"; then
+  elif echo "$out" | grep -qiE "already exists|File not found|Could not|Command not found"; then
+    # "Command not found" setxattr: the runner's e2fsprogs predates the subcommand — the
+    # label layer is a no-op for the shim anyway (rootify says the same, restorecon catches up)
     echo "  [$label] tolerated: $(echo "$out" | tail -1)"
   else
     echo "  [$label] FAILED: $(echo "$out" | tail -2)"
