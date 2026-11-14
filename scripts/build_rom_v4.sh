@@ -13,6 +13,7 @@
 #   [5] compress to the -v2 img.xz (canonical name swap happens after upload)
 #   [6] drop the raw img
 set -e
+set -o pipefail
 IMG=/tmp/rom/system.img
 SRC="${AEMU_ROOT:-$PWD/..}/download/aemu-android15-gsi-root-xposed101-modules.img.xz"
 NEW="${AEMU_ROOT:-$PWD/..}/download/aemu-android15-gsi-root-xposed101-modules-v2.img.xz"
@@ -58,12 +59,23 @@ echo "[$(date +%T)] [3.5/6] adb client: the GSI ships none in /system/bin (only 
 echo "  and a terminal without adb cannot do the one thing the user named. Static-capable"
 echo "  bionic build of AOSP platform-tools 35.0.2 (Apache-2.0), arm64, minSdk 30 <= guest 35."
 ADB_BIN="$AEMU/tools/romroot/bin/adb"
-env $DBG_ENV "$DBG" -w -R "rm /system/bin/adb" "$IMG" 2>/dev/null | grep -v "Could not" || true
-env $DBG_ENV "$DBG" -w -R "write $ADB_BIN /system/bin/adb" "$IMG" 2>&1 | tail -1
-env $DBG_ENV "$DBG" -w -R "sif /system/bin/adb mode 0100755" "$IMG" 2>/dev/null
-env $DBG_ENV "$DBG" -w -R "sif /system/bin/adb uid 0" "$IMG" 2>/dev/null
-env $DBG_ENV "$DBG" -w -R "sif /system/bin/adb gid 0" "$IMG" 2>/dev/null
-env $DBG_ENV "$DBG" -w -R "setxattr /system/bin/adb security.selinux u:object_r:system_file:s0" "$IMG" 2>/dev/null
+dbg_step() {  # dbg_step <label> <debugfs command>: loud when it fails, quiet when it works
+  label="$1"; shift
+  if out=$(env $DBG_ENV "$DBG" -w -R "$1" "$IMG" 2>&1); then
+    echo "  [$label] ok"
+  elif echo "$out" | grep -qiE "already exists|File not found|Could not"; then
+    echo "  [$label] tolerated: $(echo "$out" | tail -1)"
+  else
+    echo "  [$label] FAILED: $(echo "$out" | tail -2)"
+    exit 1
+  fi
+}
+dbg_step "rm old adb" "rm /system/bin/adb"
+dbg_step "write adb" "write $ADB_BIN /system/bin/adb"
+dbg_step "adb mode" "sif /system/bin/adb mode 0100755"
+dbg_step "adb uid" "sif /system/bin/adb uid 0"
+dbg_step "adb gid" "sif /system/bin/adb gid 0"
+dbg_step "adb xattr" "setxattr /system/bin/adb security.selinux u:object_r:system_file:s0"
 
 echo "[$(date +%T)] [3.7/6] AEmulator Manager: the guest-side root/Xposed/module surface."
 echo "  Root that nobody can see is root that 'does not work' — the manager is the Magisk-style"
@@ -71,16 +83,16 @@ echo "  entry the launcher shows: root probe, module list with enable/disable, p
 echo "  module APKs dropped into Download, and a one-tap diagnostics battery."
 MGR_APK="${AEMU_MANAGER_APK:-$AEMU/tools/romroot/manager/AEmulatorManager.apk}"
 if [ -f "$MGR_APK" ]; then
-  env $DBG_ENV "$DBG" -w -R "rm /system/app/AEmulatorManager/AEmulatorManager.apk" "$IMG" 2>/dev/null | grep -v "Could not" || true
-  env $DBG_ENV "$DBG" -R "mkdir /system/app/AEmulatorManager" "$IMG" 2>/dev/null || true
-  env $DBG_ENV "$DBG" -w -R "write $MGR_APK /system/app/AEmulatorManager/AEmulatorManager.apk" "$IMG" 2>&1 | tail -1
-  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager/AEmulatorManager.apk mode 0100644" "$IMG" 2>/dev/null
-  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager/AEmulatorManager.apk uid 0" "$IMG" 2>/dev/null
-  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager/AEmulatorManager.apk gid 0" "$IMG" 2>/dev/null
-  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager mode 040755" "$IMG" 2>/dev/null
-  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager uid 0" "$IMG" 2>/dev/null
-  env $DBG_ENV "$DBG" -w -R "sif /system/app/AEmulatorManager gid 0" "$IMG" 2>/dev/null
-  env $DBG_ENV "$DBG" -w -R "setxattr /system/app/AEmulatorManager/AEmulatorManager.apk security.selinux u:object_r:system_file:s0" "$IMG" 2>/dev/null
+  dbg_step "mgr rm" "rm /system/app/AEmulatorManager/AEmulatorManager.apk"
+  dbg_step "mgr mkdir" "mkdir /system/app/AEmulatorManager"
+  dbg_step "mgr write" "write $MGR_APK /system/app/AEmulatorManager/AEmulatorManager.apk"
+  dbg_step "mgr mode" "sif /system/app/AEmulatorManager/AEmulatorManager.apk mode 0100644"
+  dbg_step "mgr uid" "sif /system/app/AEmulatorManager/AEmulatorManager.apk uid 0"
+  dbg_step "mgr gid" "sif /system/app/AEmulatorManager/AEmulatorManager.apk gid 0"
+  dbg_step "mgr dir mode" "sif /system/app/AEmulatorManager mode 040755"
+  dbg_step "mgr dir uid" "sif /system/app/AEmulatorManager uid 0"
+  dbg_step "mgr dir gid" "sif /system/app/AEmulatorManager gid 0"
+  dbg_step "mgr xattr" "setxattr /system/app/AEmulatorManager/AEmulatorManager.apk security.selinux u:object_r:system_file:s0"
 else
   echo "  (no manager apk at $MGR_APK — build :manager and place it there, or set AEMU_MANAGER_APK)"
 fi
