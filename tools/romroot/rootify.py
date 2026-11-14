@@ -197,8 +197,8 @@ def fsck(img: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("image")
-    ap.add_argument("--su", default="/home/z/my-project/workspace/aemu/tools/romroot/su")
-    ap.add_argument("--xposed-jar", default="")
+    ap.add_argument("--su", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "su"))
+    ap.add_argument("--xposed-jar", default="", help="XposedBridge.jar from tools/xposed/build (optional)")
     ap.add_argument("--undo", action="store_true")
     ap.add_argument("--skip-fsck", action="store_true")
     a = ap.parse_args()
